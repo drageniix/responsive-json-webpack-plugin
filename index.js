@@ -172,9 +172,7 @@ module.exports = class ResponsiveJSONWebpackPlugin {
     createPictureImg(source, { img } = {}) {
         if (img) {
             const pictureImg = {
-                src: source.src,
                 sizes: img.sizes,
-                alt: source.alt,
                 srcset: img.srcset.map(srcItem => ({
                     src: this.generateFileName(source, srcItem.dest),
                     size: srcItem.size

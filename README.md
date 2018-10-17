@@ -5,6 +5,20 @@
 Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired.
 
 ## Basic Image Resize Usage
+```javascript
+const ResponsiveJSONWebpackPlugin = require
+("drageniix/responsive-json-webpack-plugin")
+
+{
+    plugins: [
+        new ResponsiveJSONWebpackPlugin({
+            sourceImages = "src/assets/images", //default
+            outputFolder = "assets" //default
+        })
+
+    ]
+}
+```
 
 ```json
 [
@@ -23,14 +37,14 @@ Set resizing instructions in JSON, can also output combined JSON with responsive
 ]
 ```
 
-Will create an optimized and compressed 16px width "sample.png" and 32px width "sample.jpg" in the output folder.
+Will create an optimized and compressed 16px width "sample.png" and 32px width "sample.jpg" in "assets/images" in the output build folder.
 
 ```json
 [
     {
         "files": [
             {
-                "src": "sample-2.png",
+                "src": "folder/sample-2.png",
                 "dest" : "helloworld",
                 "size": 16
             }
@@ -49,9 +63,25 @@ Will create an optimized and compressed 16px width "sample.png" and 32px width "
 ]
 ```
 
-Will create a 36px width "helloworld-huge.png" and an 8px width "helloworld-8.png" in output folder.
+Will create a 36px width "helloworld-huge.png" and an 8px width "helloworld-8.png" in "assets/images" in the output build folder.
 
 ## JSON Injection usage
+
+```javascript
+const ResponsiveJSONWebpackPlugin = require
+("drageniix/responsive-json-webpack-plugin")
+
+{
+    plugins: [
+        new ResponsiveJSONWebpackPlugin({
+            sourceTemplates = "src/assets/templates", //default
+            sourceImages = "src/assets/images", //deafult
+            outputFolder = "assets" //default
+        })
+
+    ]
+}
+```
 
 ### In "templates/index/data/sample.json"
 ```json
@@ -236,9 +266,7 @@ Which will output:
     "alt" : "Sample ALT",
     "size" : 16,
     "img" : {
-        "src" : "sample-8.png",
         "sizes" : "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
-        "alt" : "Sample ALT",
         "srcset" : [
             {
                 "src" : "sample-8x8",
