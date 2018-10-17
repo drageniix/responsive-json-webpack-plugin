@@ -12,6 +12,7 @@
 node_modules/
 .tmp/
 test/
+vscode/
 .eslintrc.json
 
 # OS or Editor folders
