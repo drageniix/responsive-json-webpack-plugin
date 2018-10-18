@@ -1,5 +1,5 @@
-import React from "react"
-import PropTypes from "prop-types"
+const React = require("react")
+const PropTypes = require("prop-types")
 
 const makeImageSrcSet = (srcSets, imagePath) => srcSets.map(img => `${imagePath}${img.src} ${img.size}w`).join(", ")
 
@@ -37,4 +37,4 @@ ResponsiveImage.propTypes = {
     imagePath: PropTypes.string
 }
 
-export default ResponsiveImage
+module.exports = ResponsiveImage
