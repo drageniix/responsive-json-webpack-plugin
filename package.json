@@ -1,6 +1,6 @@
 {
   "name": "responsive-json-webpack-plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Resize images and combine responsive image info with static text in json.",
   "author": "Ashley Barrow",
   "license": "MIT",
@@ -11,7 +11,7 @@
   "keywords": [
     "responsive",
     "image",
-    "images",
+    "picture",
     "resolution",
     "direction",
     "resize",
@@ -22,7 +22,8 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "webpack -p"
   },
   "dependencies": {
     "fs-extra": "^7.0.0",
@@ -30,11 +31,19 @@
     "sharp": "^0.21.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.6.1",
     "eslint-plugin-jest": "^21.24.1",
     "eslint-plugin-react": "^7.11.1",
     "jest": "^23.6.0",
-    "jest-cli": "^23.6.0"
+    "jest-cli": "^23.6.0",
+    "webpack": "^4.21.0",
+    "webpack-cli": "^3.1.2"
   }
 }
