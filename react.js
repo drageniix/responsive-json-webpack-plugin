@@ -1,1 +1,44 @@
-!function(e){var t={};function r(n){if(t[n])return t[n].exports;var c=t[n]={i:n,l:!1,exports:{}};return e[n].call(c.exports,c,c.exports,r),c.l=!0,c.exports}r.m=e,r.c=t,r.d=function(e,t,n){r.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,t){if(1&t&&(e=r(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(r.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var c in e)r.d(n,c,function(t){return e[t]}.bind(null,c));return n},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="",r(r.s=9)}([,,,,,,,,,function(e,t,r){e.exports=r(10)},function(e,t,r){var n=r(11),c=r(12),s=function(e,t){return e.map(function(e){return"".concat(t).concat(e.src," ").concat(e.size,"w")}).join(", ")},o=function(e){var t=e.className,r=e.image,c=e.alt,o=e.imagePath,i=void 0===o?"/":o;return r.sources&&window.HTMLPictureElement?n.createElement("picture",null,r.sources&&r.sources.map(function(e,t){return n.createElement("source",{key:t,srcSet:e.srcset&&s(e.srcset,i),sizes:e.sizes,media:e.media})}),n.createElement("img",{src:"".concat(i).concat(r.src),srcSet:r.srcset&&s(r.srcset,i),sizes:r.sizes,alt:c||r.alt||r.src,className:t})):n.createElement("img",{src:"".concat(i).concat(r.src),srcSet:r.srcset&&s(r.srcset,i),sizes:r.sizes,alt:c||r.alt||r.src,className:t})};o.propTypes={className:c.string,alt:c.string,image:c.object.isRequired,imagePath:c.string},e.exports=o},function(e,t){e.exports=require("react")},function(e,t){e.exports=require("prop-types")}]);
+"use strict";
+var React = require("react");
+var PropTypes = require("prop-types");
+
+var makeImageSrcSet = function makeImageSrcSet(srcSets, imagePath) {
+    return srcSets.map(function (img) {
+        return "".concat(imagePath).concat(img.src, " ").concat(img.size, "w");
+    }).join(", ");
+};
+var ResponsiveImage = function ResponsiveImage(_ref) {
+    var className = _ref.className,
+        image = _ref.image,
+        alt = _ref.alt,
+        _ref$imagePath = _ref.imagePath,
+        imagePath = _ref$imagePath === void 0 ? "/" : _ref$imagePath;
+    return image.sources && !!window.HTMLPictureElement ? React.createElement("picture", null, image.sources && image.sources.map(function (source, index) {
+        return React.createElement("source", {
+            key: index,
+            srcSet: source.srcset && makeImageSrcSet(source.srcset, imagePath),
+            sizes: source.sizes,
+            media: source.media
+        });
+    }), React.createElement("img", {
+        src: "".concat(imagePath).concat(image.src),
+        srcSet: image.srcset && makeImageSrcSet(image.srcset, imagePath),
+        sizes: image.sizes,
+        alt: alt || image.alt || image.src,
+        className: className
+    })) : React.createElement("img", {
+        src: "".concat(imagePath).concat(image.src),
+        srcSet: image.srcset && makeImageSrcSet(image.srcset, imagePath),
+        sizes: image.sizes,
+        alt: alt || image.alt || image.src,
+        className: className
+    });
+};
+
+ResponsiveImage.propTypes = {
+    className: PropTypes.string,
+    alt: PropTypes.string,
+    image: PropTypes.object.isRequired,
+    imagePath: PropTypes.string
+};
+module.exports = ResponsiveImage;
