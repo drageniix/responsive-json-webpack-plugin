@@ -1,10 +1,12 @@
-# @drageniix/responsive-json-webpack-plugin
+# responsive-json-webpack-plugin
 
 [![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/react.svg)](https://github.com/drageniix/responsive-json-webpack-plugin)
 
 Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired.
 
 ## Basic Image Resize Usage
+
+webpack.config.js
 ```javascript
 const ResponsiveJSONWebpackPlugin = require
 ("drageniix/responsive-json-webpack-plugin")
@@ -20,6 +22,7 @@ const ResponsiveJSONWebpackPlugin = require
 }
 ```
 
+src/assets/templates/images.json
 ```json
 [
     {
@@ -65,11 +68,18 @@ Will create an optimized and compressed 16px width "sample.png" and 32px width "
 
 Will create a 36px width "helloworld-huge.png" and an 8px width "helloworld-8.png" in "assets/images" in the output build folder.
 
-## JSON Injection usage
+## JSON Injection Usage
+You can use this json directly with React with 
+```javascript
+import ResponsiveImage from 'responsive-json-webpack-plugin/react'
+
+<ResponsiveImage image={json.imagePath} className="" alt="" />
+
+```
 
 ```javascript
 const ResponsiveJSONWebpackPlugin = require
-("drageniix/responsive-json-webpack-plugin")
+("responsive-json-webpack-plugin")
 
 {
     plugins: [
@@ -151,8 +161,6 @@ Will output a 16px width "sample-3.png" and a 24px with "section.png" along with
 }
 ```
 
-## Advanced JSON Injection
-
 You can output an array at the path by giving multiple files.
 ```json
 [
@@ -209,7 +217,7 @@ This will output:
 }
 ```
 
-## Responsive Usage
+## Responsive Image JSON Injection Usage
 
 Here is a full responsive image example that utilizes both resolution switching and art direction! If your "files" image has a "dest", that will be the basis of "[name]" in the "imageTemplate" "img". Your "files" images are always copied, even if never explicitly used, to serve as a backup in case a browser doesn't support the "picture" element or the like.
 
@@ -265,15 +273,13 @@ Which will output:
     "src" : "sample-8.png",
     "alt" : "Sample ALT",
     "size" : 16,
-    "img" : {
-        "sizes" : "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
-        "srcset" : [
-            {
-                "src" : "sample-8x8",
-                "size" : 8
-            }
-        ]
-    },
+    "sizes" : "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
+    "srcset" : [
+        {
+            "src" : "sample-8x8",
+            "size" : 8
+        }
+    ],
     "sources" : [
         {
             "media" : "(max-width: 37.5em)",

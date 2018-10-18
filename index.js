@@ -24,7 +24,8 @@ module.exports = class ResponsiveJSONWebpackPlugin {
         }
     }
 
-    run(compilation){
+
+    async run(compilation) {
         const dependencies = this.getChangedDependencies(compilation)
 
         this.processedFileNames = []
@@ -32,16 +33,12 @@ module.exports = class ResponsiveJSONWebpackPlugin {
         this.folders = dependencies.folders
         this.files = dependencies.files
 
-        return this.processDataFolders(
-            dependencies.changedFolders,
-        ).then(() => this.processRawFiles(
-            dependencies.changedPureFiles,
-        ))
+        await this.processDataFolders(dependencies.changedFolders)
+        await this.processRawFiles(dependencies.changedPureFiles)
     }
 
     apply(compiler) {
-        const self = this
-        compiler.hooks.emit.tapPromise("ResponsiveJSONPlugin", this.run.bind(self))
+        compiler.hooks.emit.tapPromise("ResponsiveJSONPlugin", this.run.bind(this))
     }
 
     saveJSON(folder, jsonMap) {
@@ -52,17 +49,15 @@ module.exports = class ResponsiveJSONWebpackPlugin {
         }
     }
 
-    savePicture(sourceFilePath, { src, size }) {
+    async savePicture(sourceFilePath, { src, size }) {
         if (!this.processedFileNames.includes(src)) {
             this.processedFileNames.push(src)
-            return sharp(sourceFilePath).resize(size).toBuffer({ resolveWithObject: true })
-                .then(({ data, info }) => { //todo: webp fallback
-                    this.assets[`./${src}`] = {
-                        source: () => data,
-                        size: () => info.size,
-                    }
-                })
-        } else return Promise.resolve()
+            const { data, info } = await sharp(sourceFilePath).resize(size).toBuffer({ resolveWithObject: true })
+            this.assets[`./${src}`] = {
+                source: () => data,
+                size: () => info.size,
+            }
+        }
     }
 
     processRawFiles(dataFiles) {
@@ -133,23 +128,24 @@ module.exports = class ResponsiveJSONWebpackPlugin {
         ))
     }
 
-    createPortionPictures(entry) {
-        return Promise.all(entry.files.map((item, index) => {
-            const source = this.parseSource(entry.files.length, entry.alt, index, item)
-            const resultPortion = {}
-            return this.createPictureSources(source, entry.imageTemplate)
-                .then(pSources => resultPortion.sources = pSources)
-                .then(() => this.createPictureImg(source, entry.imageTemplate))
-                .then(pImg => resultPortion.img = pImg)
-                .then(() => this.createImg(source, item.dest))
-                .then(img => ({ ...img, ...resultPortion }))
-
-        })).then(files => files.length === 1 ? files[0] : files)
+    async createPortionPictures(entry) {
+        const files = await Promise.all(entry.files.map(async (item, index) => {
+            const source = this.parseSource(entry.files.length, entry.alt, index, item);
+            const pictureSources = await this.createPictureSources(source, entry.imageTemplate);
+            const imgResolutions = await this.createImgResolutions(source, entry.imageTemplate);
+            const img = await this.createImg(source, item.dest);
+            return Promise.resolve({
+                ...img,
+                ...imgResolutions,
+                sources: pictureSources
+            });
+        }));
+        return files.length === 1 ? files[0] : files;
     }
 
     createPictureSources(source, { sources } = {}) {
         if (sources) {
-            return Promise.all(sources.map(pictureSourcesPartial => {
+            return Promise.all(sources.map(async pictureSourcesPartial => {
                 const pictureSource = {
                     media: pictureSourcesPartial.media,
                     sizes: pictureSourcesPartial.sizes,
@@ -160,18 +156,19 @@ module.exports = class ResponsiveJSONWebpackPlugin {
                     }))
                 }
 
-                return Promise.all(pictureSource.srcset.map(
-                    srcItem => {
-                        const file = srcItem.file; delete srcItem.file
-                        return this.savePicture(`${this.dirs.sourceImages}/${file}`, srcItem, source.extension)
-                    })).then(() => pictureSource)
+                await Promise.all(pictureSource.srcset.map(srcItem => {
+                    const file = srcItem.file;
+                    delete srcItem.file;
+                    return this.savePicture(`${this.dirs.sourceImages}/${file}`, srcItem, source.extension);
+                }));
+                return pictureSource;
             }))
         } else return Promise.resolve()
     }
 
-    createPictureImg(source, { img } = {}) {
+    async createImgResolutions(source, { img } = {}) {
         if (img) {
-            const pictureImg = {
+            const imgResolutions = {
                 sizes: img.sizes,
                 srcset: img.srcset.map(srcItem => ({
                     src: this.generateFileName(source, srcItem.dest),
@@ -179,21 +176,21 @@ module.exports = class ResponsiveJSONWebpackPlugin {
                 }))
             }
 
-            return Promise.all(pictureImg.srcset.map(
-                srcItem => this.savePicture(`${this.dirs.sourceImages}/${source.src}`, srcItem, source.extension))
-            ).then(() => pictureImg)
-        } else return Promise.resolve()
+            await Promise.all(imgResolutions.srcset.map(srcItem => this.savePicture(`${this.dirs.sourceImages}/${source.src}`, srcItem, source.extension)));
+            return imgResolutions;
+        }
+        return {}
     }
 
-    createImg(source, dest) {
+    async createImg(source, dest) {
         const img = {
             src: this.generateFileName(source, dest),
             size: source.size,
             alt: source.alt
         }
 
-        return this.savePicture(`${this.dirs.sourceImages}/${source.src}`, img, source.extension)
-            .then(() => img)
+        await this.savePicture(`${this.dirs.sourceImages}/${source.src}`, img, source.extension);
+        return img;
     }
 
     parseSource(filesLength, alt, index, item) {
