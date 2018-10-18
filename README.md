@@ -2,18 +2,23 @@
 
 [![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/react.svg)](https://github.com/drageniix/responsive-json-webpack-plugin)
 
-Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired.
+Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired. Uses sharp and fs-extra. **89% Coverage**.
 
-## Basic Image Resize Usage
+## Install
+```
+npm install responsive-json-webpack-plugin
+```
+
+# Basic Image Resize Usage
 
 webpack.config.js
 ```javascript
-const ResponsiveJSONWebpackPlugin = require
-("drageniix/responsive-json-webpack-plugin")
+const ResponsiveJSONWebpackPlugin = require("responsive-json-webpack-plugin")
 
 {
     plugins: [
         new ResponsiveJSONWebpackPlugin({
+            sourceTemplates = "src/assets/templates" //default
             sourceImages = "src/assets/images", //default
             outputFolder = "assets" //default
         })
@@ -21,6 +26,9 @@ const ResponsiveJSONWebpackPlugin = require
     ]
 }
 ```
+
+
+The following will create an optimized and compressed 16px width "sample.png" and 32px width "sample.jpg" in "assets/images" in the output build folder, given that the appropriate source files are in "src/assets/images".
 
 src/assets/templates/images.json
 ```json
@@ -40,7 +48,7 @@ src/assets/templates/images.json
 ]
 ```
 
-Will create an optimized and compressed 16px width "sample.png" and 32px width "sample.jpg" in "assets/images" in the output build folder.
+The following will create a 36px width "helloworld-huge.png" and an 8px width "helloworld-8.png" in "assets/images" in the output build folder. Note that "[name]" and "[size]" will be replaced appropriately.
 
 ```json
 [
@@ -66,32 +74,8 @@ Will create an optimized and compressed 16px width "sample.png" and 32px width "
 ]
 ```
 
-Will create a 36px width "helloworld-huge.png" and an 8px width "helloworld-8.png" in "assets/images" in the output build folder.
-
-## JSON Injection Usage
-You can use this json directly with React with 
-```javascript
-import ResponsiveImage from 'responsive-json-webpack-plugin/react'
-
-<ResponsiveImage image={json.imagePath} className="" alt="" />
-
-```
-
-```javascript
-const ResponsiveJSONWebpackPlugin = require
-("responsive-json-webpack-plugin")
-
-{
-    plugins: [
-        new ResponsiveJSONWebpackPlugin({
-            sourceTemplates = "src/assets/templates", //default
-            sourceImages = "src/assets/images", //deafult
-            outputFolder = "assets" //default
-        })
-
-    ]
-}
-```
+# JSON Injection Usage
+JSON injection uses the same webpack options, but requires a folder structure where the first subdirectory in the template folder is the output json file name. It must contain the folders "data" and "images", with matching filenames for those which belong to the same key. E.g.:
 
 ### In "templates/index/data/sample.json"
 ```json
@@ -161,7 +145,7 @@ Will output a 16px width "sample-3.png" and a 24px with "section.png" along with
 }
 ```
 
-You can output an array at the path by giving multiple files.
+You can also output an array at the path by giving multiple files in an image template file.
 ```json
 [
     {
@@ -180,9 +164,9 @@ You can output an array at the path by giving multiple files.
 ]
 ```
 
-You can also inject an image at each item in an exisiting an array by using this syntax. The "[]" will be replaced by the index of the item in the set. The index does not need to match the exisiting array in length, but does need a valid path.
+It is possible to inject an image at each item in an exisiting an array by using the following syntax. 
 
-Array set dest can use "[name]" "[size]" and "[index]", while standard usage can use "[name]" and "[size]".
+The "[]" will be replaced by the index of the item in the set. The index does not need to match the exisiting array in length, but does need a valid path. Set destination file names will replace "[name]" "[size]" and "[index]" appropriately.
 
 ```json
 {
@@ -217,11 +201,11 @@ This will output:
 }
 ```
 
-## Responsive Image JSON Injection Usage
+# Responsive Image JSON Injection Usage
 
-Here is a full responsive image example that utilizes both resolution switching and art direction! If your "files" image has a "dest", that will be the basis of "[name]" in the "imageTemplate" "img". Your "files" images are always copied, even if never explicitly used, to serve as a backup in case a browser doesn't support the "picture" element or the like.
+Here is a full responsive image example that utilizes both resolution switching and art direction! If your source file has a "dest", that will be the basis of "[name]". Your "files" images are always copied, even if never explicitly used, to serve as a backup in case a browser doesn't support the "picture" element or the like.
 
-Keep in mind that most fields can be safely omitted, but are recommended if you are using this with the included ResponsiveImage.jsx file.
+Keep in mind that most fields can be safely omitted, but are recommended if you are using this with the included React file.
 
 ```json
 [
@@ -297,4 +281,13 @@ Which will output:
         }
     ],
 }
+```
+# React
+You can use the resulting json directly with React.
+
+```javascript
+import ResponsiveImage from 'responsive-json-webpack-plugin/react'
+
+<ResponsiveImage image={outputJSON.imagePath} className="" alt="" />
+
 ```
