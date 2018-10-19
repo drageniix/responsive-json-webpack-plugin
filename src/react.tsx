@@ -1,10 +1,9 @@
-const React = require("react")
-const PropTypes = require("prop-types")
+import * as React from "react"
 
 const makeImageSrcSet = (srcSets, imagePath) => srcSets.map(img => `${imagePath}${img.src} ${img.size}w`).join(", ")
 
-const ResponsiveImage = ({ className, image, alt, imagePath = "/"}) => (
-    image.sources && !!window.HTMLPictureElement ? 
+const ResponsiveImage = ({ image, className, alt, imagePath = "/" }: { image: any, className?: string, alt?: string, imagePath?: string}) => (
+    image.sources && !!(window as any).HTMLPictureElement ? 
         <picture>
 
             {image.sources && image.sources.map((source, index) => (
@@ -30,11 +29,4 @@ const ResponsiveImage = ({ className, image, alt, imagePath = "/"}) => (
             className={className} /> 
 )
 
-ResponsiveImage.propTypes = {
-    className: PropTypes.string,
-    alt: PropTypes.string,
-    image: PropTypes.object.isRequired,
-    imagePath: PropTypes.string
-}
-
-module.exports = ResponsiveImage
+export default ResponsiveImage

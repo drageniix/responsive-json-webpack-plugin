@@ -1,1 +1,13 @@
-"use strict";var React=require("react"),PropTypes=require("prop-types"),makeImageSrcSet=function(e,s){return e.map(function(e){return"".concat(s).concat(e.src," ").concat(e.size,"w")}).join(", ")},ResponsiveImage=function(e){var s=e.className,t=e.image,c=e.alt,r=e.imagePath,a=void 0===r?"/":r;return t.sources&&window.HTMLPictureElement?React.createElement("picture",null,t.sources&&t.sources.map(function(e,s){return React.createElement("source",{key:s,srcSet:e.srcset&&makeImageSrcSet(e.srcset,a),sizes:e.sizes,media:e.media})}),React.createElement("img",{src:"".concat(a).concat(t.src),srcSet:t.srcset&&makeImageSrcSet(t.srcset,a),sizes:t.sizes,alt:c||t.alt||t.src,className:s})):React.createElement("img",{src:"".concat(a).concat(t.src),srcSet:t.srcset&&makeImageSrcSet(t.srcset,a),sizes:t.sizes,alt:c||t.alt||t.src,className:s})};ResponsiveImage.propTypes={className:PropTypes.string,alt:PropTypes.string,image:PropTypes.object.isRequired,imagePath:PropTypes.string},module.exports=ResponsiveImage;
+"use strict";
+exports.__esModule = true;
+var React = require("react");
+var makeImageSrcSet = function (srcSets, imagePath) { return srcSets.map(function (img) { return "" + imagePath + img.src + " " + img.size + "w"; }).join(", "); };
+var ResponsiveImage = function (_a) {
+    var image = _a.image, className = _a.className, alt = _a.alt, _b = _a.imagePath, imagePath = _b === void 0 ? "/" : _b;
+    return (image.sources && !!window.HTMLPictureElement ?
+        React.createElement("picture", null,
+            image.sources && image.sources.map(function (source, index) { return (React.createElement("source", { key: index, srcSet: source.srcset && makeImageSrcSet(source.srcset, imagePath), sizes: source.sizes, media: source.media })); }),
+            React.createElement("img", { src: "" + imagePath + image.src, srcSet: image.srcset && makeImageSrcSet(image.srcset, imagePath), sizes: image.sizes, alt: alt || image.alt || image.src, className: className })) :
+        React.createElement("img", { src: "" + imagePath + image.src, srcSet: image.srcset && makeImageSrcSet(image.srcset, imagePath), sizes: image.sizes, alt: alt || image.alt || image.src, className: className }));
+};
+exports["default"] = ResponsiveImage;
