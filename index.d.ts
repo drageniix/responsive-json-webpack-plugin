@@ -102,4 +102,4 @@ declare class ResponsiveJSONWebpackPlugin {
         changedPureFiles: any[];
     };
 }
-export default ResponsiveJSONWebpackPlugin;
+export = ResponsiveJSONWebpackPlugin;

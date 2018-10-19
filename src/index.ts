@@ -1,5 +1,6 @@
-import * as fs from "fs-extra";
-import * as sharp from "sharp";
+import fs from "fs-extra";
+import sharp from "sharp";
+import path from "path"
 
 type directoryOptions = {
     dataPath: string
@@ -55,9 +56,9 @@ type sourceBase = {
 }
 
 class ResponsiveJSONWebpackPlugin {
+    private options: directoryOptions
     private dirs: directoryOptions
     private slashRegex: RegExp = new RegExp("/", "g")
-    private stripRegex: RegExp = /^\/+|^\.\/+|\/+$/g
     private processedFileNames: Array<string>
     private folders: object = {}
     private files: object = {}
@@ -71,27 +72,32 @@ class ResponsiveJSONWebpackPlugin {
             sourceImages = "src/assets/images",
             outputFolder = "assets"
         } = {}) {
-
-        this.dirs = {
-            dataPath: dataPath.replace(this.stripRegex, ""),
-            imagePath: imagePath.replace(this.stripRegex, ""),
-            sourceTemplates: sourceTemplates.replace(this.stripRegex, ""),
-            sourceImages: sourceImages.replace(this.stripRegex, ""),
-            outputFolder: outputFolder.replace(this.stripRegex, "")
+        
+        this.dirs = this.options = {
+            dataPath,
+            imagePath,
+            sourceTemplates,
+            sourceImages,
+            outputFolder
         }
     }
 
 
     async run(compilation) {
-        const dependencies = this.getChangedDependencies(compilation)
+        this.dirs.sourceTemplates = path.resolve(compilation.compiler.context, this.options.sourceTemplates)
+        this.dirs.sourceImages = path.resolve(compilation.compiler.context, this.options.sourceImages)
+        this.dirs.outputFolder = path.resolve(compilation.compiler.context, this.options.outputFolder)  
+
+        const dependencies = this.getDependencies(compilation)
+        const processedDependencies = this.getChangedDependencies(dependencies)
 
         this.processedFileNames = []
         this.assets = compilation.assets
-        this.folders = dependencies.folders
-        this.files = dependencies.files
+        this.folders = processedDependencies.folders
+        this.files = processedDependencies.files
 
-        await this.processDataFolders(dependencies.changedFolders)
-        await this.processRawFiles(dependencies.changedPureFiles)
+        await this.processDataFolders(processedDependencies.changedFolders)
+        await this.processRawFiles(processedDependencies.changedPureFiles)
     }
 
     apply(compiler) {
@@ -109,10 +115,15 @@ class ResponsiveJSONWebpackPlugin {
     async savePicture(sourceFilePath: string, { src, size }: { src: string, size: number }) {
         if (!this.processedFileNames.includes(src)) {
             this.processedFileNames.push(src)
-            const { data, info } = await sharp(sourceFilePath).resize(size).toBuffer({ resolveWithObject: true })
-            this.assets[`./${src}`] = {
-                source: () => data,
-                size: () => info.size,
+            try {
+                const { data, info } = await sharp(sourceFilePath).resize(size).toBuffer({ resolveWithObject: true })
+                this.assets[`./${src}`] = {
+                    source: () => data,
+                    size: () => info.size,
+                }
+            } catch(err) {
+                this.processedFileNames.pop()
+                console.error(`ResponsiveJSONWebpackPlugin ${err} --"${sourceFilePath}"`)
             }
         }
     }
@@ -125,6 +136,28 @@ class ResponsiveJSONWebpackPlugin {
         ))
     }
 
+
+    processRawItem(files, alternates?: Array<srcAlter>) {
+        return Promise.all(files.map(({ src, size, dest }) => {
+            const srcName = src.slice(this.getLastSlash(src) + 1, src.lastIndexOf("."))
+            const source = {
+                size,
+                name: (dest && dest.slice(this.getLastSlash(dest) + 1).replace("[name]", srcName)) || srcName,
+                extension: src.slice(src.lastIndexOf("."))
+            }
+
+            return alternates ?
+                Promise.all(alternates.map(alter => this.savePicture(
+                    `${this.dirs.sourceImages}/${src}`,
+                    { src: this.generateFileName(source, alter.dest), size: alter.size, },
+                )))
+                : this.savePicture(
+                    `${this.dirs.sourceImages}/${src}`,
+                    { src: this.generateFileName(source, dest), size },
+                )
+        }))
+    }
+    
     processDataFolders(dataFolders: Array<string>) {
         return Promise.all(dataFolders.map(folder =>
             fs.readdir(`${this.dirs.sourceTemplates}/${folder}/${this.dirs.dataPath}`)
@@ -149,27 +182,6 @@ class ResponsiveJSONWebpackPlugin {
                     })
                 )
         ))
-    }
-
-    processRawItem(files, alternates?: Array<srcAlter>) {
-        return Promise.all(files.map(({ src, size, dest }) => {
-            const srcName = src.slice(src.lastIndexOf("/") + 1, src.lastIndexOf("."))
-            const source = {
-                size,
-                name: (dest && dest.slice(dest.lastIndexOf("/") + 1).replace("[name]", srcName)) || srcName,
-                extension: src.slice(src.lastIndexOf("."))
-            }
-
-            return alternates ?
-                Promise.all(alternates.map(alter => this.savePicture(
-                    `${this.dirs.sourceImages}/${src}`,
-                    { src: this.generateFileName(source, alter.dest), size: alter.size, },
-                )))
-                : this.savePicture(
-                    `${this.dirs.sourceImages}/${src}`,
-                    { src: this.generateFileName(source, dest), size },
-                )
-        }))
     }
 
     injectImagesIntoDataFile(images: Array<srcEntry>, data: object) {
@@ -205,16 +217,16 @@ class ResponsiveJSONWebpackPlugin {
                 const pictureSource = {
                     media: pictureSourcesPartial.media,
                     sizes: pictureSourcesPartial.sizes,
-                    srcset: pictureSourcesPartial.srcset.map(srcItem => ({
-                        file: srcItem.src,
+                    srcset: pictureSourcesPartial.srcset.map((srcItem): srcImg => ({
+                        dest: srcItem.src,
                         src: this.generateFileName(source, srcItem.dest),
                         size: srcItem.size
                     }))
                 }
 
                 await Promise.all(pictureSource.srcset.map(srcItem => {
-                    const file = srcItem.file;
-                    delete srcItem.file;
+                    const file = srcItem.dest;
+                    delete srcItem.dest;
                     return this.savePicture(`${this.dirs.sourceImages}/${file}`, srcItem);
                 }));
                 return pictureSource;
@@ -226,13 +238,14 @@ class ResponsiveJSONWebpackPlugin {
         if (img) {
             const imgResolutions = {
                 sizes: img.sizes,
-                srcset: img.srcset.map(srcItem => ({
+                srcset: img.srcset.map((srcItem): srcImg => ({
                     src: this.generateFileName(source, srcItem.dest),
-                    size: srcItem.size
+                    size: srcItem.size  
                 }))
             }
 
-            await Promise.all(imgResolutions.srcset.map(srcItem => this.savePicture(`${this.dirs.sourceImages}/${source.src}`, srcItem)));
+            await Promise.all(imgResolutions.srcset.map(srcItem => 
+                this.savePicture(`${this.dirs.sourceImages}/${source.src}`, srcItem)));
             return imgResolutions;
         }
         return {}
@@ -250,16 +263,20 @@ class ResponsiveJSONWebpackPlugin {
     }
 
     parseSource(filesLength: number, index: number, item: srcImg, alt?: string): sourceBase {
-        const srcName = item.src.slice(item.src.lastIndexOf("/") + 1, item.src.lastIndexOf("."))
+        const srcName = item.src.slice(this.getLastSlash(item.src) + 1, item.src.lastIndexOf("."))
         const entryIndex = filesLength > 1 ? index + 1 : 0
         return {
             index: entryIndex,
             alt: alt && entryIndex ? alt + " " + entryIndex : alt,
-            name: (item.dest && item.dest.slice(item.dest.lastIndexOf("/") + 1).replace("[name]", srcName)) || srcName,
+            name: (item.dest && item.dest.slice(this.getLastSlash(item.dest) + 1).replace("[name]", srcName)) || srcName,
             extension: item.src.slice(item.src.lastIndexOf(".")),
             src: item.src,
             size: item.size
         }
+    }
+
+    getLastSlash(str: string): number {
+        return str.includes("\\") ? str.lastIndexOf("\\") : str.lastIndexOf("/")
     }
 
     stripInvalid(str) {
@@ -294,36 +311,40 @@ class ResponsiveJSONWebpackPlugin {
             value)
     }
 
-    getDependencies(dir: string, compilationDependenciesSet: Set<string>, rootdir: string, dependencies: Array<string>): void {
-        const list = fs.readdirSync(dir)
-        list.forEach(file => {
-            file = dir + "/" + file
-            const stat = fs.statSync(file)
-            if (stat && stat.isDirectory()) {
-                this.getDependencies(file, compilationDependenciesSet, rootdir, dependencies)
-            } else {
-                if (file.slice(file.lastIndexOf(".")) === ".json") {
-                    dependencies.push(file)
-                    compilationDependenciesSet.add(rootdir + "\\" + file.replace(this.slashRegex, "\\"))
-                }
-            }
-        })
+    getDependencies({ contextDependencies, fileDependencies, compiler: { context } }): Array<string> {
+        contextDependencies.add(path.resolve(context, this.dirs.sourceTemplates).replace(this.slashRegex, "\\"))
+        const dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context)
+        for (let file of dependencies) {
+            fileDependencies.add(file)
+        }
+        return dependencies
     }
 
-    getChangedDependencies(compilation) {
+    readFolderDependencies(dir: string, context: string, dependencies: Array<string> = []): Array<string> {
+        const list = fs.readdirSync(dir)
+        list.forEach(file => {
+            file = dir + "\\" + file
+            const stat = fs.statSync(file)
+            if (stat && stat.isDirectory()) {
+                this.readFolderDependencies(file, context, dependencies)
+            } else if (file.slice(file.lastIndexOf(".")) === ".json") {
+                dependencies.push(path.resolve(context, file).replace(this.slashRegex, "\\"))
+            }
+        })
+
+        return dependencies
+    }
+
+    getChangedDependencies(fileDependencies) {
         const folders = {}
         const files = {}
         const changedFolders = new Set()
         const changedPureFiles = []
-        const fileDependencies = []
-
-        compilation.contextDependencies.add(compilation.compiler.context + "\\" + this.dirs.sourceTemplates.replace(this.slashRegex, "\\"))
-        this.getDependencies(this.dirs.sourceTemplates, compilation.fileDependencies, compilation.compiler.context, fileDependencies)
-
+        
         fileDependencies.forEach(rawFileName => {
-            const folderFile = rawFileName.slice(rawFileName.indexOf(this.dirs.sourceTemplates) + this.dirs.sourceTemplates.length + 1, rawFileName.lastIndexOf("/"))
-            const folder = folderFile.slice(0, folderFile.indexOf("/"))
-            const group = folderFile.slice(folderFile.indexOf("/") + 1)
+            const folderFile = rawFileName.slice(rawFileName.indexOf(this.dirs.sourceTemplates) + this.dirs.sourceTemplates.length + 1, this.getLastSlash(rawFileName))
+            const folder = folderFile.slice(0, folderFile.indexOf("\\"))
+            const group = folderFile.slice(folderFile.indexOf("\\") + 1)
 
             const time = fs.statSync(rawFileName).mtime.getTime()
             if ((group === this.dirs.dataPath || group === this.dirs.imagePath) && folder) {
@@ -361,4 +382,4 @@ class ResponsiveJSONWebpackPlugin {
     }
 }
 
-export default ResponsiveJSONWebpackPlugin
+export = ResponsiveJSONWebpackPlugin

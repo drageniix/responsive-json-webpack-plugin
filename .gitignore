@@ -11,8 +11,8 @@
 *.sass-cache
 node_modules/
 .tmp/
-test/
 vscode/
+coverage/
 .eslintrc.json
 
 # OS or Editor folders

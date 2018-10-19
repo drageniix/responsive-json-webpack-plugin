@@ -29,4 +29,4 @@ const ResponsiveImage = ({ image, className, alt, imagePath = "/" }: { image: an
             className={className} /> 
 )
 
-export default ResponsiveImage
+export = ResponsiveImage

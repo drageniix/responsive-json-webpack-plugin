@@ -5,4 +5,4 @@ declare const ResponsiveImage: ({ image, className, alt, imagePath }: {
     alt?: string;
     imagePath?: string;
 }) => JSX.Element;
-export default ResponsiveImage;
+export = ResponsiveImage;

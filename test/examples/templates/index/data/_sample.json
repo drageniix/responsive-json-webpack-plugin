@@ -1,0 +1,14 @@
+{
+    "text" : "This is sample text?",
+    "array" : [
+        {
+            "title": "foo"
+        },
+        {
+            "title" : "bar"
+        }
+    ],
+    "section" : {
+        "title" : "Contains Duplicate Image"
+    }
+}

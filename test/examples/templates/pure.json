@@ -1,0 +1,49 @@
+[
+    {
+        "files": [
+            {
+                "src": "sample-1.png",
+                "size" : 16
+            }
+        ]
+    },
+    {
+        "files": [
+            {
+                "src": "sample-2.png",
+                "dest" : "herrso",
+                "size": 16
+            }
+        ],
+        "alternates": [
+            {
+                "size": 36,
+                "dest": "[name]-huge"
+            },
+            {
+                "size": 8,
+                "dest": "[name]-smaller"
+            }
+        ]
+    },
+    {
+        "files": [
+            {
+                "src": "sample-2.png"
+            },
+            {
+                "src": "sample-3.png"
+            }
+        ],
+        "alternates": [
+            {
+                "size": 8,
+                "dest": "[name]-smaller"
+            },
+            {
+                "size": 24,
+                "dest": "[name]-larger"
+            }
+        ]
+    }
+]
