@@ -1,8 +1,7 @@
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
+
 const rjInstance = new ResponsiveJSONWebpackPlugin({
-    sourceTemplates: "../examples/templates",
     sourceImages: "../examples/images",
-    outputFolder: "examples/output"
 })
 
 rjInstance.savePicture = jest.fn()

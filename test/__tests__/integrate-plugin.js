@@ -1,10 +1,6 @@
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
 
-const rjInstance = new ResponsiveJSONWebpackPlugin({
-    sourceTemplates: "../examples/templates",
-    sourceImages: "../examples/images",
-    outputFolder: "examples/output"
-})
+const rjInstance = new ResponsiveJSONWebpackPlugin()
 
 test("apply", () => {
     rjInstance.apply({hooks:{emit: {tapPromise(){}}}})

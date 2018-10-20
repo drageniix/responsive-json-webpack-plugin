@@ -1,4 +1,5 @@
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
+
 const rjInstance = new ResponsiveJSONWebpackPlugin({
     sourceTemplates: "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\examples\\templates",
     sourceImages: "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\examples\\images",

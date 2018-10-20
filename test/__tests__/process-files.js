@@ -1,9 +1,6 @@
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
-const rjInstance = new ResponsiveJSONWebpackPlugin({
-    sourceTemplates: "../examples/templates",
-    sourceImages: "../examples/images",
-    outputFolder: "examples/output"
-})
+
+const rjInstance = new ResponsiveJSONWebpackPlugin()
 
 describe("create portion pictures", () => {
     rjInstance.parseSource = jest.fn()

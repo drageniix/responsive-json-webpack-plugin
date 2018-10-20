@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`snapshot 1`] = `
+<img
+  alt="test.jpg"
+  src="root/test.jpg"
+/>
+`;
+
+exports[`snapshot 2`] = `
+<img
+  alt="Sample ALT"
+  sizes="(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px"
+  src="/sample-8.png"
+  srcSet="/sample-8x8 8w"
+/>
+`;
+
+exports[`snapshot 3`] = `
+<picture>
+  <source
+    key="0"
+    media="(max-width: 37.5em)"
+    sizes="20vw"
+    srcSet="/potato.png 16w, /sample-10-x16 16w"
+  />
+  <img
+    alt="sample-8.png"
+    sizes="(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px"
+    src="/sample-8.png"
+    srcSet="/sample-8x8 8w"
+  />
+</picture>
+`;

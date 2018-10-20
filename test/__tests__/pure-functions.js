@@ -1,4 +1,5 @@
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
+
 let rjInstance
 
 test("initialization", () => {
