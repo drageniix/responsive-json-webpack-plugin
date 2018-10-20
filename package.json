@@ -20,7 +20,7 @@
     "webpack",
     "plugin"
   ],
-  "main": "ResponsiveJSONWebpackPlugin.js",
+  "main": "index.js",
   "scripts": {
     "test": "jest --config=jest.config.js",
     "build": "tsc --declaration"
