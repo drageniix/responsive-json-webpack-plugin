@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
 
 let rjInstance
@@ -79,12 +80,15 @@ describe("save to assets", () => {
         const src = "sample-1.png"
         const size = 16
         const sourceFileName = "invalidpath"
+        console.error = jest.fn()
 
         rjInstance.processedFileNames = []
         rjInstance.assets = {}
 
         return rjInstance.savePicture(sourceFileName, { src, size })
             .then(() => {
+                expect(console.error).toHaveBeenCalled();
+                console.error.mockRestore()
                 expect(rjInstance.processedFileNames).toHaveLength(0)
                 expect(Object.keys(rjInstance.assets)).toHaveLength(0)
             })
@@ -116,6 +120,17 @@ describe("generation of file names", () => {
 
     test("empty input", () => {
         expect(() => rjInstance.generateFileName()).toThrowError()
+    })
+
+    test("slashes", () => {
+        expect(rjInstance.getFirstSlash("a\\b\\c")).toBe(1)
+        expect(rjInstance.getFirstSlash("a/b/c")).toBe(1)
+        expect(rjInstance.getFirstSlash("a\\/b/\\c")).toBe(1)
+        expect(rjInstance.getFirstSlash("abc")).toBe(-1)
+        expect(rjInstance.getLastSlash("a\\b\\c")).toBe(3)
+        expect(rjInstance.getLastSlash("a/b/c")).toBe(3)
+        expect(rjInstance.getLastSlash("a/\\b/\\c")).toBe(5)
+        expect(rjInstance.getLastSlash("abc")).toBe(-1)
     })
 })
 

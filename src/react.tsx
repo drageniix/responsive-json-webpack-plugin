@@ -2,7 +2,27 @@ import * as React from "react"
 
 const makeImageSrcSet = (srcSets, imagePath) => srcSets.map(img => `${imagePath}${img.src} ${img.size}w`).join(", ")
 
-const ResponsiveImage = ({ image, className, alt, imagePath = "/" }: { image: any, className?: string, alt?: string, imagePath?: string}) => (
+type individualImage = {
+    src: string,
+    size: number
+}
+
+type source = {
+    media: string,
+    sizes: string,
+    srcset: Array<individualImage>
+}
+
+type jsonImage = {
+    src: string,
+    alt?: string,
+    size: number, //not used
+    sizes?: string,
+    srcset?: Array<individualImage>,
+    sources?: Array<source>
+}
+
+const ResponsiveImage = ({ image, className, alt, imagePath = "/" }: { image: jsonImage, className?: string, alt?: string, imagePath?: string}) => (
     image.sources && window && !!(window as any).HTMLPictureElement ? 
         <picture>
 

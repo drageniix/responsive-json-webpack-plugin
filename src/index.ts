@@ -1,6 +1,11 @@
 import fs from "fs-extra";
 import sharp from "sharp";
-import path from "path"
+import path from "path";
+import Ajv from "ajv";
+
+const rawSchema = require("./raw-files-schema.json")
+const ajv = new Ajv()
+const rawValidate = ajv.compile(rawSchema)
 
 type directoryOptions = {
     dataPath: string
@@ -58,7 +63,7 @@ type sourceBase = {
 class ResponsiveJSONWebpackPlugin {
     private options: directoryOptions
     private dirs: directoryOptions
-    private slashRegex: RegExp = new RegExp("/", "g")
+    private slashRegex: RegExp = new RegExp(/\\/, "g")
     private processedFileNames: Array<string>
     private folders: object = {}
     private files: object = {}
@@ -84,8 +89,8 @@ class ResponsiveJSONWebpackPlugin {
 
 
     async run(compilation) {
-        this.dirs.sourceTemplates = path.resolve(compilation.compiler.context, this.options.sourceTemplates)
-        this.dirs.sourceImages = path.resolve(compilation.compiler.context, this.options.sourceImages)
+        this.dirs.sourceTemplates = path.resolve(compilation.compiler.context, this.options.sourceTemplates).replace(this.slashRegex, "/")
+        this.dirs.sourceImages = path.resolve(compilation.compiler.context, this.options.sourceImages).replace(this.slashRegex, "/")
 
         const dependencies = this.getDependencies(compilation)
         const processedDependencies = this.getChangedDependencies(dependencies)
@@ -129,9 +134,14 @@ class ResponsiveJSONWebpackPlugin {
 
     processRawFiles(dataFiles: Array<string>) {
         return Promise.all(dataFiles.map(file =>
-            fs.readJSON(file).then(json =>
-                Promise.all(json.map(({ files, alternates }: { files: Array<srcImg>, alternates?: Array<srcAlter>}) =>
-                    this.processRawItem(files, alternates))))
+            fs.readJSON(file).then(data => {
+                const valid = rawValidate(data)
+                if (valid) {
+                    return Promise.all(data.map(({ files, alternates }: { files: Array<srcImg>, alternates?: Array<srcAlter>}) => this.processRawItem(files, alternates)))
+                } else {
+                    console.error(`ResponsiveJSONWebpackPlugin: ${file}`, "\n", rawValidate.errors.map(err => `path '${err.dataPath}' ${err.message}`).join(", "))
+                }
+            })
         ))
     }
 
@@ -152,28 +162,24 @@ class ResponsiveJSONWebpackPlugin {
     }
     
     processDataFolders(dataFolders: Array<string>) {
-        return Promise.all(dataFolders.map(folder =>
-            fs.readdir(`${this.dirs.sourceTemplates}/${folder}/${this.dirs.dataPath}`)
-                .then(dataFiles => this.processDataFiles(folder, dataFiles))
-                .then(jsonMap => this.saveJSON(folder, jsonMap))
-        ))
+        return Promise.all(dataFolders.map(folder => this.processDataFiles(folder).then(jsonMap => this.saveJSON(folder, jsonMap))))
     }
 
-    processDataFiles(folder: string, dataFiles: Array<string>) {
+    processDataFiles(folder: string) {
+        const dataFiles = this.folders[folder].filenames.filter(name => name.startsWith(this.dirs.dataPath))
+        
         return Promise.all(dataFiles.map(file =>
-            fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${this.dirs.dataPath}/${file}`)
-                .then(data => fs.pathExists(`${this.dirs.sourceTemplates}/${folder}/${this.dirs.imagePath}/${file}`)
-                    .then(async exists => {
-                        if (exists) {
-                            const images = await fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${this.dirs.imagePath}/${file}`);
-                            return this.injectImagesIntoDataFile(images, data);
-                        }
-                    })
-                    .then(() => {
-                        const jsonKey = file.startsWith("_") ? file.substring(1, file.lastIndexOf(".")) : file.substring(0, file.lastIndexOf("."))
-                        return { [jsonKey]: data }
-                    })
-                )
+            fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
+                .then(async data => {
+                    const imageFile = file.replace(this.dirs.dataPath, this.dirs.imagePath)
+                    if (this.folders[folder].filenames.includes(imageFile)){
+                        const images = await fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${imageFile}`);
+                        await this.injectImagesIntoDataFile(images, data);
+                    }
+                    file = file.replace(`${this.dirs.dataPath}/`, "")
+                    const jsonKey = file.startsWith("_") ? file.substring(1, file.lastIndexOf(".")) : file.substring(0, file.lastIndexOf("."))
+                    return { [jsonKey]: data }
+                })
         ))
     }
 
@@ -278,6 +284,12 @@ class ResponsiveJSONWebpackPlugin {
         }
     }
 
+    getFirstSlash(str: string): number {
+        const win = str.indexOf("\\")
+        const oth = str.indexOf("/")
+        return (win < 0 && oth < 0) || ( win < 0 ) ? oth : win
+    }
+
     getLastSlash(str: string): number {
         return Math.max(str.lastIndexOf("\\"), str.lastIndexOf("/"))
     }
@@ -315,23 +327,23 @@ class ResponsiveJSONWebpackPlugin {
     }
 
     getDependencies({ contextDependencies, fileDependencies, compiler: { context } }): Array<string> {
-        contextDependencies.add(path.resolve(context, this.dirs.sourceTemplates).replace(this.slashRegex, "\\"))
-        const dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context, [])
+        contextDependencies.add(path.resolve(context, this.dirs.sourceTemplates).replace(this.slashRegex, "/"))
+        const dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context)
         for (let file of dependencies) {
             fileDependencies.add(file)
         }
         return dependencies
     }
 
-    readFolderDependencies(dir: string, context: string, dependencies: Array<string>): Array<string> {
+    readFolderDependencies(dir: string, context: string, dependencies: Array<string> = []): Array<string> {
         const list = fs.readdirSync(dir)
         list.forEach(file => {
-            file = dir + "\\" + file
+            file = dir + "/" + file
             const stat = fs.statSync(file)
             if (stat && stat.isDirectory()) {
                 this.readFolderDependencies(file, context, dependencies)
             } else if (file.slice(file.lastIndexOf(".")) === ".json") {
-                dependencies.push(path.resolve(context, file).replace(this.slashRegex, "\\"))
+                dependencies.push(path.resolve(context, file).replace(this.slashRegex, "/"))
             }
         })
 
@@ -346,8 +358,8 @@ class ResponsiveJSONWebpackPlugin {
         
         fileDependencies.forEach(rawFileName => {
             const folderFile = rawFileName.slice(rawFileName.indexOf(this.dirs.sourceTemplates) + this.dirs.sourceTemplates.length + 1, this.getLastSlash(rawFileName))
-            const folder = folderFile.slice(0, folderFile.indexOf("\\"))
-            const group = folderFile.slice(folderFile.indexOf("\\") + 1)
+            const folder = folderFile.slice(0, this.getFirstSlash(folderFile))
+            const group = folderFile.slice(this.getFirstSlash(folderFile) + 1)
 
             const time = fs.statSync(rawFileName).mtime.getTime()
             if ((group === this.dirs.dataPath || group === this.dirs.imagePath) && folder) {

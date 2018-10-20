@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
 
 const rjInstance = new ResponsiveJSONWebpackPlugin({
@@ -59,6 +60,17 @@ describe("raw files", () => {
             expect(result).toHaveLength(1)
             expect(result[0]).toHaveLength(3)
             expect(rjInstance.processRawItem).toHaveBeenCalledTimes(3)
+        })
+    })
+
+    test("reject invalid JSON", () => {
+        rjInstance.processRawItem = jest.fn()
+        console.error = jest.fn()
+        return rjInstance.processRawFiles([
+            "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\examples\\templates\\invalid.json"
+        ]).then(() => {
+            expect(console.error).toHaveBeenCalled();
+            console.error.mockRestore()
         })
     })
 })

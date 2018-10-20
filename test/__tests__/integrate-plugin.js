@@ -24,5 +24,15 @@ test("run", () => {
         contextDependencies: new Set(),
         fileDependencies: new Set(),
         compiler: { context: "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\__tests__" }
+    }).then(() => {
+        expect(rjInstance.dirs).toEqual(
+            {
+                dataPath: 'data',
+                imagePath: 'images',
+                sourceTemplates: 'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/__tests__/src/assets/templates',
+                sourceImages: 'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/__tests__/src/assets/images',
+                outputFolder: 'assets'
+            }
+        )
     })
 })
