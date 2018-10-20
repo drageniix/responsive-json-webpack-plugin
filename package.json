@@ -1,6 +1,6 @@
 {
   "name": "responsive-json-webpack-plugin",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Resize images and combine responsive image info with static text in json.",
   "author": "Ashley Barrow",
   "license": "MIT",
