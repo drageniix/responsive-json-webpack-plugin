@@ -86,7 +86,6 @@ class ResponsiveJSONWebpackPlugin {
     async run(compilation) {
         this.dirs.sourceTemplates = path.resolve(compilation.compiler.context, this.options.sourceTemplates)
         this.dirs.sourceImages = path.resolve(compilation.compiler.context, this.options.sourceImages)
-        this.dirs.outputFolder = path.resolve(compilation.compiler.context, this.options.outputFolder)  
 
         const dependencies = this.getDependencies(compilation)
         const processedDependencies = this.getChangedDependencies(dependencies)

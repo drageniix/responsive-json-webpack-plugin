@@ -73,7 +73,6 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                     case 0:
                         this.dirs.sourceTemplates = path_1["default"].resolve(compilation.compiler.context, this.options.sourceTemplates);
                         this.dirs.sourceImages = path_1["default"].resolve(compilation.compiler.context, this.options.sourceImages);
-                        this.dirs.outputFolder = path_1["default"].resolve(compilation.compiler.context, this.options.outputFolder);
                         dependencies = this.getDependencies(compilation);
                         processedDependencies = this.getChangedDependencies(dependencies);
                         this.processedFileNames = [];
