@@ -18,60 +18,85 @@ const source = {
     src: "basic.jpg",
 }
 
-test("parse source", () => {
-    expect(rjInstance.parseSource(1, 0,
-        {
-            src: "basic.jpg",
+describe("parse source", () => {
+    test("raw source", () => {
+        expect(rjInstance.parseRawSource({
+            src: "sample-2.png",
+            dest: "herrso",
             size: 16
-        }
-    )).toEqual(source)
-    
-    expect(rjInstance.parseSource(1, 1,
-        {
-            src: "withDest.tiff",
+        })).toEqual({
+            extension: ".png",
+            name: "herrso",
             size: 16,
-            dest: "destination"
-        }
-    )).toEqual(
-        {
-            extension: ".tiff",
-            index: 0,
-            name: "destination",
-            size: 16,
-            src: "withDest.tiff",
-        }
-    )
+            src: "sample-2.png"
+        })
 
-    expect(rjInstance.parseSource(3, 0,
-        {
-            src: "folder/inArray.jpg",
-            size: 16
-        }
-    )).toEqual(
-        {
-            extension: ".jpg",
-            index: 1,
-            name: "inArray",
-            size: 16,
-            src: "folder/inArray.jpg",
-        }
-    )
+        expect(rjInstance.parseRawSource({
+            src: "sample-3.png",
+            size: 24,
+        })).toEqual({
+            extension: ".png",
+            name: "sample-3",
+            size: 24,
+            src: "sample-3.png"
+        })
+    })
 
-    expect(rjInstance.parseSource(2, 0,
-        {
-            src: "inArrayAlt.jpg",
-            size: 16
-        }
-    , "sample alt")).toEqual(
-        {
-            extension: ".jpg",
-            index: 1,
-            name: "inArrayAlt",
-            size: 16,
-            src: "inArrayAlt.jpg",
-            alt: "sample alt 1"
-        }
-    )
+    test("embedded source", () => {
+        expect(rjInstance.parseSource(1, 0,
+            {
+                src: "basic.jpg",
+                size: 16
+            }
+        )).toEqual(source)
+
+        expect(rjInstance.parseSource(1, 1,
+            {
+                src: "withDest.tiff",
+                size: 16,
+                dest: "destination"
+            }
+        )).toEqual(
+            {
+                extension: ".tiff",
+                index: 0,
+                name: "destination",
+                size: 16,
+                src: "withDest.tiff",
+            }
+        )
+
+        expect(rjInstance.parseSource(3, 0,
+            {
+                src: "folder/inArray.jpg",
+                size: 16
+            }
+        )).toEqual(
+            {
+                extension: ".jpg",
+                index: 1,
+                name: "inArray",
+                size: 16,
+                src: "folder/inArray.jpg",
+            }
+        )
+
+        expect(rjInstance.parseSource(2, 0,
+            {
+                src: "inArrayAlt.jpg",
+                size: 16
+            }
+            , "sample alt")).toEqual(
+                {
+                    extension: ".jpg",
+                    index: 1,
+                    name: "inArrayAlt",
+                    size: 16,
+                    src: "inArrayAlt.jpg",
+                    alt: "sample alt 1"
+                }
+            )
+    })
 })
 
 describe("create img", () => {

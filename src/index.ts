@@ -131,29 +131,23 @@ class ResponsiveJSONWebpackPlugin {
     processRawFiles(dataFiles: Array<string>) {
         return Promise.all(dataFiles.map(file =>
             fs.readJSON(file).then(json =>
-                Promise.all(json.map(({ files, alternates }) =>
+                Promise.all(json.map(({ files, alternates }: { files: Array<srcImg>, alternates?: Array<srcAlter>}) =>
                     this.processRawItem(files, alternates))))
         ))
     }
 
 
     processRawItem(files, alternates?: Array<srcAlter>) {
-        return Promise.all(files.map(({ src, size, dest }) => {
-            const srcName = src.slice(this.getLastSlash(src) + 1, src.lastIndexOf("."))
-            const source = {
-                size,
-                name: (dest && dest.slice(this.getLastSlash(dest) + 1).replace("[name]", srcName)) || srcName,
-                extension: src.slice(src.lastIndexOf("."))
-            }
-
+        return Promise.all(files.map((rawItem: srcImg) => {
+            const source = this.parseRawSource(rawItem)
             return alternates ?
                 Promise.all(alternates.map(alter => this.savePicture(
-                    `${this.dirs.sourceImages}/${src}`,
+                    `${this.dirs.sourceImages}/${rawItem.src}`,
                     { src: this.generateFileName(source, alter.dest), size: alter.size, },
                 )))
                 : this.savePicture(
-                    `${this.dirs.sourceImages}/${src}`,
-                    { src: this.generateFileName(source, dest), size },
+                    `${this.dirs.sourceImages}/${rawItem.src}`,
+                    { src: this.generateFileName(source, rawItem.dest), size: rawItem.size },
                 )
         }))
     }
@@ -275,8 +269,18 @@ class ResponsiveJSONWebpackPlugin {
         }
     }
 
+    parseRawSource({ size, src, dest }: srcImg): sourceBase {
+        const srcName = src.slice(this.getLastSlash(src) + 1, src.lastIndexOf("."))
+        return {
+            size,
+            src,
+            name: (dest && dest.slice(this.getLastSlash(dest) + 1).replace("[name]", srcName)) || srcName,
+            extension: src.slice(src.lastIndexOf("."))
+        }
+    }
+
     getLastSlash(str: string): number {
-        return str.includes("\\") ? str.lastIndexOf("\\") : str.lastIndexOf("/")
+        return Math.max(str.lastIndexOf("\\"), str.lastIndexOf("/"))
     }
 
     stripInvalid(str) {
@@ -313,14 +317,14 @@ class ResponsiveJSONWebpackPlugin {
 
     getDependencies({ contextDependencies, fileDependencies, compiler: { context } }): Array<string> {
         contextDependencies.add(path.resolve(context, this.dirs.sourceTemplates).replace(this.slashRegex, "\\"))
-        const dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context)
+        const dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context, [])
         for (let file of dependencies) {
             fileDependencies.add(file)
         }
         return dependencies
     }
 
-    readFolderDependencies(dir: string, context: string, dependencies: Array<string> = []): Array<string> {
+    readFolderDependencies(dir: string, context: string, dependencies: Array<string>): Array<string> {
         const list = fs.readdirSync(dir)
         list.forEach(file => {
             file = dir + "\\" + file
