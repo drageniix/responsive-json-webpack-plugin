@@ -41,9 +41,9 @@ declare type sourceBase = {
     size: number;
 };
 declare class ResponsiveJSONWebpackPlugin {
+    private options;
     private dirs;
     private slashRegex;
-    private stripRegex;
     private processedFileNames;
     private folders;
     private files;
@@ -63,21 +63,17 @@ declare class ResponsiveJSONWebpackPlugin {
         size: number;
     }): Promise<void>;
     processRawFiles(dataFiles: Array<string>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}][]>;
+    processRawItem(files: any, alternates?: Array<srcAlter>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
     processDataFolders(dataFolders: Array<string>): Promise<void[]>;
     processDataFiles(folder: string, dataFiles: Array<string>): Promise<{
         [x: string]: any;
     }[]>;
-    processRawItem(files: any, alternates?: Array<srcAlter>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
     injectImagesIntoDataFile(images: Array<srcEntry>, data: object): Promise<any[]>;
     createPortionPictures(entry: srcEntry | srcSet): Promise<object>;
     createPictureSources(source: sourceBase, { sources }?: imageTemplate): Promise<void> | Promise<{
         media: string;
         sizes: string;
-        srcset: {
-            file: string;
-            src: string;
-            size: number;
-        }[];
+        srcset: srcImg[];
     }[]>;
     createImgResolutions(source: any, { img }?: imageTemplate): Promise<{}>;
     createImg(source: sourceBase, dest?: string): Promise<{
@@ -86,6 +82,8 @@ declare class ResponsiveJSONWebpackPlugin {
         alt: string;
     }>;
     parseSource(filesLength: number, index: number, item: srcImg, alt?: string): sourceBase;
+    parseRawSource({ size, src, dest }: srcImg): sourceBase;
+    getLastSlash(str: string): number;
     stripInvalid(str: any): string;
     generateFileName({ name, index, size, extension }?: {
         name?: string;
@@ -94,8 +92,15 @@ declare class ResponsiveJSONWebpackPlugin {
         extension?: string;
     }, dest?: any): string;
     index(obj: object, objPath: (string | Array<string>), value: any): any;
-    getDependencies(dir: string, compilationDependenciesSet: Set<string>, rootdir: string, dependencies: Array<string>): void;
-    getChangedDependencies(compilation: any): {
+    getDependencies({ contextDependencies, fileDependencies, compiler: { context } }: {
+        contextDependencies: any;
+        fileDependencies: any;
+        compiler: {
+            context: any;
+        };
+    }): Array<string>;
+    readFolderDependencies(dir: string, context: string, dependencies: Array<string>): Array<string>;
+    getChangedDependencies(fileDependencies: any): {
         folders: {};
         files: {};
         changedFolders: any[];
