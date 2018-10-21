@@ -18,6 +18,7 @@ test("run", () => {
     
     rjInstance.processDataFolders = jest.fn()
     rjInstance.processRawFiles = jest.fn()
+    rjInstance.processDirectFiles = jest.fn()
     
     return rjInstance.run({
         assets: {},

@@ -17,7 +17,7 @@ describe("dependencies", () => {
         
     test("read directory", () => {
         rjInstance.readFolderDependencies(rjInstance.dirs.sourceTemplates, compilation.compiler.context, dependencies)
-        expect(dependencies).toHaveLength(7)
+        expect(dependencies).toHaveLength(8)
         expect(rjInstance.readFolderDependencies(rjInstance.dirs.sourceTemplates, compilation.compiler.context)).toEqual(dependencies)
     })
 
@@ -50,12 +50,18 @@ describe("dependencies", () => {
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json": expect.any(Number),
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json": expect.any(Number) 
             },
+            "direct": {
+                "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/rawtest.json": expect.any(Number),
+            },
             changedFolders: [
                 "index", "secondary"
             ],
             changedPureFiles: [
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json",
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json"
+            ],
+            changedDirectFiles: [
+                "rawtest"
             ]
         })
 
@@ -84,9 +90,15 @@ describe("dependencies", () => {
             "changedPureFiles": [
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json",
             ],
+            changedDirectFiles : [
+                "rawtest"
+            ],
             "files": {
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json": expect.any(Number),
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json": expect.any(Number)
+            },
+            "direct": {
+                "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/rawtest.json": expect.any(Number),
             },
             "folders": {
                 "index": {

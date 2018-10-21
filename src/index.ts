@@ -70,6 +70,7 @@ class ResponsiveJSONWebpackPlugin {
     private processedFileNames: Array<string>
     private folders: object = {}
     private files: object = {}
+    private direct: object = {}
     private assets: object
     
     constructor(
@@ -102,9 +103,11 @@ class ResponsiveJSONWebpackPlugin {
         this.assets = compilation.assets
         this.folders = processedDependencies.folders
         this.files = processedDependencies.files
+        this.direct = processedDependencies.direct
 
         await this.processDataFolders(processedDependencies.changedFolders)
         await this.processRawFiles(processedDependencies.changedPureFiles)
+        await this.processDirectFiles(processedDependencies.changedDirectFiles)
     }
 
     apply(compiler) {
@@ -133,6 +136,13 @@ class ResponsiveJSONWebpackPlugin {
                 console.error(`ResponsiveJSONWebpackPlugin ${err} --"${sourceFilePath}"`)
             }
         }
+    }
+
+    processDirectFiles(dataFiles: Array<string>){
+        return Promise.all(dataFiles.map(file =>
+            fs.readJSON(`${this.dirs.sourceTemplates}/raw/${file}.json`)
+                .then(data => this.saveJSON(file, [data]))
+        ))
     }
 
     processRawFiles(dataFiles: Array<string>) {
@@ -173,7 +183,7 @@ class ResponsiveJSONWebpackPlugin {
         
         return Promise.all(dataFiles.map(file =>
             fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
-                .then(data => this.checkImageFile(folder,  file, data))
+                .then(data => this.checkImageFile(folder, file, data))
                 .then(data => {
                     const fileKey = file.replace(`${this.dirs.dataPath}/`, "")
                     const jsonKey = fileKey.startsWith("_") ? fileKey.substring(1, fileKey.lastIndexOf(".")) : fileKey.substring(0, fileKey.lastIndexOf("."))
@@ -365,16 +375,24 @@ class ResponsiveJSONWebpackPlugin {
     getChangedDependencies(fileDependencies) {
         const folders = {}
         const files = {}
+        const direct = {}
         const changedFolders = new Set()
         const changedPureFiles = []
+        const changedDirectFiles = []
         
         fileDependencies.forEach(rawFileName => {
             const folderFile = rawFileName.slice(rawFileName.indexOf(this.dirs.sourceTemplates) + this.dirs.sourceTemplates.length + 1, this.getLastSlash(rawFileName))
             const folder = folderFile.slice(0, this.getFirstSlash(folderFile))
             const group = folderFile.slice(this.getFirstSlash(folderFile) + 1)
+            const fileName = rawFileName.slice(this.getLastSlash(rawFileName) + 1, rawFileName.lastIndexOf('.'))
 
             const time = fs.statSync(rawFileName).mtime.getTime()
-            if ((group === this.dirs.dataPath || group === this.dirs.imagePath) && folder) {
+            if (folderFile === "raw") {
+                if (this.direct[rawFileName] !== time) {
+                    changedDirectFiles.push(fileName)
+                }
+                direct[rawFileName] = time
+            } else if ((group === this.dirs.dataPath || group === this.dirs.imagePath) && folder) {
                 folders[folder] = folders[folder] ? folders[folder] : {
                     lastUpdate: [],
                     filenames: []
@@ -403,8 +421,10 @@ class ResponsiveJSONWebpackPlugin {
         return {
             folders,
             files,
+            direct,
             changedFolders: Array.from(changedFolders),
-            changedPureFiles
+            changedPureFiles,
+            changedDirectFiles
         }
     }
 }

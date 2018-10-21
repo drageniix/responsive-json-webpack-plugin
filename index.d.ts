@@ -47,6 +47,7 @@ declare class ResponsiveJSONWebpackPlugin {
     private processedFileNames;
     private folders;
     private files;
+    private direct;
     private assets;
     constructor({ dataPath, imagePath, sourceTemplates, sourceImages, outputFolder }?: {
         dataPath?: string;
@@ -62,6 +63,7 @@ declare class ResponsiveJSONWebpackPlugin {
         src: string;
         size: number;
     }): Promise<void>;
+    processDirectFiles(dataFiles: Array<string>): Promise<void[]>;
     processRawFiles(dataFiles: Array<string>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}][]>;
     processRawItem(files: any, alternates?: Array<srcAlter>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
     processDataFolders(dataFolders: Array<string>): Promise<void[]>;
@@ -103,8 +105,10 @@ declare class ResponsiveJSONWebpackPlugin {
     getChangedDependencies(fileDependencies: any): {
         folders: {};
         files: {};
+        direct: {};
         changedFolders: any[];
         changedPureFiles: any[];
+        changedDirectFiles: any[];
     };
 }
 export = ResponsiveJSONWebpackPlugin;

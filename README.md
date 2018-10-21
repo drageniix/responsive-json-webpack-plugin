@@ -27,6 +27,8 @@ const ResponsiveJSONWebpackPlugin = require("responsive-json-webpack-plugin")
 }
 ```
 
+## As JSON copier
+If you just want to directly copy a json file without having to require it in your javascript via a separate loader, put it in a folder called "raw" in your templates. It will be minimized and put in the outputFolder/data with the same name.
 
 The following will create an optimized and compressed 16px width "sample.png" and 32px width "sample.jpg" in "assets/images" in the output build folder, given that the appropriate source files are in "src/assets/images".
 
