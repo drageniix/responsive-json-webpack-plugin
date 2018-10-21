@@ -3,9 +3,12 @@ import sharp from "sharp";
 import path from "path";
 import Ajv from "ajv";
 
-const rawSchema = require("./raw-files-schema.json")
+const rawSchema = require("./schemas/raw-file.json")
+const responsiveSchema = require("./schemas/responsive.json")
 const ajv = new Ajv()
+
 const rawValidate = ajv.compile(rawSchema)
+const responsiveValidate = ajv.compile(responsiveSchema)
 
 type directoryOptions = {
     dataPath: string
@@ -170,17 +173,26 @@ class ResponsiveJSONWebpackPlugin {
         
         return Promise.all(dataFiles.map(file =>
             fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
-                .then(async data => {
-                    const imageFile = file.replace(this.dirs.dataPath, this.dirs.imagePath)
-                    if (this.folders[folder].filenames.includes(imageFile)){
-                        const images = await fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${imageFile}`);
-                        await this.injectImagesIntoDataFile(images, data);
-                    }
-                    file = file.replace(`${this.dirs.dataPath}/`, "")
-                    const jsonKey = file.startsWith("_") ? file.substring(1, file.lastIndexOf(".")) : file.substring(0, file.lastIndexOf("."))
+                .then(data => this.checkImageFile(folder,  file, data))
+                .then(data => {
+                    const fileKey = file.replace(`${this.dirs.dataPath}/`, "")
+                    const jsonKey = fileKey.startsWith("_") ? fileKey.substring(1, fileKey.lastIndexOf(".")) : fileKey.substring(0, fileKey.lastIndexOf("."))
                     return { [jsonKey]: data }
                 })
         ))
+    }
+
+    async checkImageFile(folder, file, data){
+        const imageFile = file.replace(this.dirs.dataPath, this.dirs.imagePath)
+        if (this.folders[folder].filenames.includes(imageFile)) {
+            const images = await fs.readJSON(`${this.dirs.sourceTemplates}/${folder}/${imageFile}`)
+            if (responsiveValidate(images)) {
+                await this.injectImagesIntoDataFile(images, data)
+            } else {
+                console.error(`ResponsiveJSONWebpackPlugin: ${file}`, "\n", responsiveValidate.errors.map(err => `path '${err.dataPath}' ${err.message}`).join(", "))
+            }
+        }
+        return data
     }
 
     injectImagesIntoDataFile(images: Array<srcEntry>, data: object) {

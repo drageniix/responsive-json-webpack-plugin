@@ -65,9 +65,8 @@ declare class ResponsiveJSONWebpackPlugin {
     processRawFiles(dataFiles: Array<string>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}][]>;
     processRawItem(files: any, alternates?: Array<srcAlter>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
     processDataFolders(dataFolders: Array<string>): Promise<void[]>;
-    processDataFiles(folder: string, dataFiles: Array<string>): Promise<{
-        [x: string]: any;
-    }[]>;
+    processDataFiles(folder: string): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
+    checkImageFile(folder: any, file: any, data: any): Promise<any>;
     injectImagesIntoDataFile(images: Array<srcEntry>, data: object): Promise<any[]>;
     createPortionPictures(entry: srcEntry | srcSet): Promise<object>;
     createPictureSources(source: sourceBase, { sources }?: imageTemplate): Promise<void> | Promise<{
@@ -83,6 +82,7 @@ declare class ResponsiveJSONWebpackPlugin {
     }>;
     parseSource(filesLength: number, index: number, item: srcImg, alt?: string): sourceBase;
     parseRawSource({ size, src, dest }: srcImg): sourceBase;
+    getFirstSlash(str: string): number;
     getLastSlash(str: string): number;
     stripInvalid(str: any): string;
     generateFileName({ name, index, size, extension }?: {
@@ -99,7 +99,7 @@ declare class ResponsiveJSONWebpackPlugin {
             context: any;
         };
     }): Array<string>;
-    readFolderDependencies(dir: string, context: string, dependencies: Array<string>): Array<string>;
+    readFolderDependencies(dir: string, context: string, dependencies?: Array<string>): Array<string>;
     getChangedDependencies(fileDependencies: any): {
         folders: {};
         files: {};

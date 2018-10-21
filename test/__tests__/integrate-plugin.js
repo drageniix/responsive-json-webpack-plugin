@@ -23,7 +23,7 @@ test("run", () => {
         assets: {},
         contextDependencies: new Set(),
         fileDependencies: new Set(),
-        compiler: { context: "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\__tests__" }
+        compiler: { context: __dirname }
     }).then(() => {
         expect(rjInstance.dirs).toEqual(
             {

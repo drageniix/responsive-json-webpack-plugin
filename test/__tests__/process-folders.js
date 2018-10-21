@@ -9,7 +9,7 @@ const rjInstance = new ResponsiveJSONWebpackPlugin({
 rjInstance.folders = {
     index: {
         filenames: [
-            "data/icons.json", "data/_sample.json", "images/_sample.json"
+            "data/icons.json", "data/_sample.json", "images/icons.json", "images/_sample.json"
         ]
     },
     secondary: {
@@ -22,11 +22,15 @@ rjInstance.folders = {
 describe("integrated files", () => {
     test("process files", () => {
         rjInstance.injectImagesIntoDataFile = jest.fn()
+        console.error = jest.fn()
 
         return rjInstance.processDataFiles("index").then(result => {
             expect(result[1]["sample"]).toBeTruthy()
             expect(result[0]["icons"]).toBeTruthy()
             expect(rjInstance.injectImagesIntoDataFile).toHaveBeenCalledTimes(1)
+            expect(console.error).toHaveBeenCalled();
+            console.error.mockRestore()
+
         })
     })
     

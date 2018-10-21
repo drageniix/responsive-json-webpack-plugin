@@ -1,11 +1,9 @@
 {
     "definitions": {},
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://example.com/root.json",
     "type": "array",
     "title": "Raw File Resizing JSON",
     "items": {
-        "$id": "#/items",
         "type": "object",
         "title": "Set of Resize Instructions",
         "required": [
@@ -13,11 +11,9 @@
         ],
         "properties": {
             "files": {
-                "$id": "#/items/properties/files",
                 "type": "array",
                 "title": "Files to Process",
                 "items": {
-                    "$id": "#/items/properties/files/items",
                     "type": "object",
                     "title": "File",
                     "required": [
@@ -25,21 +21,18 @@
                     ],
                     "properties": {
                         "src": {
-                            "$id": "#/items/properties/files/items/properties/src",
                             "type": "string",
                             "title": "Filepath",
                             "default": "",
                             "pattern": "^(.*)$"
                         },
                         "dest": {
-                            "$id": "#/items/properties/files/items/properties/dest",
                             "type": "string",
                             "title": "Output Filename",
                             "default": "",
                             "pattern": "^(.*)$"
                         },
                         "size": {
-                            "$id": "#/items/properties/files/items/properties/size",
                             "type": "integer",
                             "title": "Desired Width of Image",
                             "default": 0
@@ -48,33 +41,32 @@
                 }
             },
             "alternates": {
-                "$id": "#/items/properties/alternates",
                 "type": "array",
                 "title": "The Alternates Schema",
                 "items": {
-                    "$id": "#/items/properties/alternates/items",
                     "type": "object",
-                    "title": "The Items Schema",
+                    "title": "File",
                     "required": [
-                        "size",
-                        "dest"
+                        "dest",
+                        "size"
                     ],
                     "properties": {
-                        "size": {
-                            "$id": "#/items/properties/alternates/items/properties/size",
-                            "type": "integer",
-                            "title": "Desired Width of Image",
-                            "default": 0
+                        "src": {
+                            "type": "string",
+                            "title": "Filepath",
+                            "default": "",
+                            "pattern": "^(.*)$"
                         },
                         "dest": {
-                            "$id": "#/items/properties/alternates/items/properties/dest",
                             "type": "string",
                             "title": "Output Filename",
                             "default": "",
-                            "examples": [
-                                "[name]-hu/ge-[size]"
-                            ],
                             "pattern": "^(.*)$"
+                        },
+                        "size": {
+                            "type": "integer",
+                            "title": "Desired Width of Image",
+                            "default": 0
                         }
                     }
                 }

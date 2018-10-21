@@ -96,9 +96,11 @@
                         "size" : 16
                     },
                     {
+                        "dest": "pineapple-[index]1",
                         "size": 8
                     },
                     {
+                        "dest": "pineapple-[index]2",
                         "size": 36
                     }
                 ]

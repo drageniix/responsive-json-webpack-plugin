@@ -1,0 +1,139 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "definitions": {
+        "srcImg" : {
+            "type": "object",
+            "title": "File",
+            "oneOf": [
+                {
+                    "required": [
+                        "src",
+                        "size"
+                    ]
+                },
+                {
+                    "required": [
+                        "dest",
+                        "size"
+                    ]
+                }
+            ],
+            "properties": {
+                "src": {
+                    "type": "string",
+                    "title": "Filepath",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                },
+                "dest": {
+                    "type": "string",
+                    "title": "Output Filename",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                },
+                "size": {
+                    "type": "integer",
+                    "title": "Desired Width of Image",
+                    "default": 0
+                }
+            }
+        },
+        "imageTemplate" : {
+            "type": "object",
+            "title": "Responsive Image Options",
+            "properties": {
+                "img": {
+                    "type": "object",
+                    "title": "Resolution Switching Options",
+                    "required": [
+                        "srcset"
+                    ],
+                    "properties": {
+                        "sizes": {
+                            "type": "string"
+                        },
+                        "srcset": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "title": "File",
+                                "required": [
+                                    "dest",
+                                    "size"
+                                ],
+                                "properties": {
+                                    "src": {
+                                        "type": "string",
+                                        "title": "Filepath",
+                                        "default": "",
+                                        "pattern": "^(.*)$"
+                                    },
+                                    "dest": {
+                                        "type": "string",
+                                        "title": "Output Filename",
+                                        "default": "",
+                                        "pattern": "^(.*)$"
+                                    },
+                                    "size": {
+                                        "type": "integer",
+                                        "title": "Desired Width of Image",
+                                        "default": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "sources": {
+                    "type": "array",
+                    "title": "Art Direction Sources",
+                    "required": [
+                        "srcset"
+                    ],
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "sizes": {
+                                "type": "string"
+                            },
+                            "media": {
+                                "type": "string"
+                            },
+                            "srcset": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "title": "File",
+                                    "required": [
+                                        "dest",
+                                        "size"
+                                    ],
+                                    "properties": {
+                                        "src": {
+                                            "type": "string",
+                                            "title": "Filepath",
+                                            "default": "",
+                                            "pattern": "^(.*)$"
+                                        },
+                                        "dest": {
+                                            "type": "string",
+                                            "title": "Output Filename",
+                                            "default": "",
+                                            "pattern": "^(.*)$"
+                                        },
+                                        "size": {
+                                            "type": "integer",
+                                            "title": "Desired Width of Image",
+                                            "default": 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -17,7 +17,7 @@ describe("dependencies", () => {
         
     test("read directory", () => {
         rjInstance.readFolderDependencies(rjInstance.dirs.sourceTemplates, compilation.compiler.context, dependencies)
-        expect(dependencies).toHaveLength(6)
+        expect(dependencies).toHaveLength(7)
         expect(rjInstance.readFolderDependencies(rjInstance.dirs.sourceTemplates, compilation.compiler.context)).toEqual(dependencies)
     })
 
@@ -33,21 +33,22 @@ describe("dependencies", () => {
         expect(rjInstance.getChangedDependencies(dependencies)).toEqual({
             folders: {
                 index: {
-                    lastUpdate: 1539995571385,
+                    lastUpdate: expect.any(Number),
                     filenames: [
                         "data/icons.json",
                         "data/_sample.json",
+                        "images/icons.json",
                         "images/_sample.json"
                     ]
                 },
                 secondary: { 
-                    lastUpdate: 1539982153928, 
+                    lastUpdate: expect.any(Number), 
                     filenames: ["data/other.json"] 
                 }
             },
             files: { 
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json": expect.any(Number),
-                "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json": 1539124763943 
+                "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json": expect.any(Number) 
             },
             changedFolders: [
                 "index", "secondary"
@@ -63,10 +64,11 @@ describe("dependencies", () => {
     test("changed dependencies", () => {
         rjInstance.folders = {
             index: {
-                lastUpdate: 1539995571385,
+                lastUpdate: 1540079321855,
                 filenames: [
                     "data/icons.json",
                     "data/_sample.json",
+                    "images/icons.json",
                     "images/_sample.json"
                 ]
             }
@@ -84,22 +86,23 @@ describe("dependencies", () => {
             ],
             "files": {
                 "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json": expect.any(Number),
-                "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json": 1539124763943
+                "D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json": expect.any(Number)
             },
             "folders": {
                 "index": {
                     "filenames": [
                         "data/icons.json",
                         "data/_sample.json",
+                        "images/icons.json",
                         "images/_sample.json"
                     ],
-                    "lastUpdate": 1539995571385
+                    "lastUpdate": expect.any(Number)
                 },
                 "secondary": {
                     "filenames": [
                         "data/other.json"
                     ],
-                    "lastUpdate": 1539982153928
+                    "lastUpdate": expect.any(Number)
                 }
             }
         })
