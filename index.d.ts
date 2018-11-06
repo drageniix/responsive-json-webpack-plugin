@@ -93,7 +93,7 @@ declare class ResponsiveJSONWebpackPlugin {
         size?: number;
         extension?: string;
     }, dest?: any): string;
-    index(obj: object, objPath: (string | Array<string>), value: any): any;
+    index(obj: object, objPath: string | Array<string>, value: any): any;
     getDependencies({ contextDependencies, fileDependencies, compiler: { context } }: {
         contextDependencies: any;
         fileDependencies: any;
