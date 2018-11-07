@@ -1,194 +1,198 @@
-const ResponsiveJSONWebpackPlugin = require("../../src/index.ts")
+const ResponsiveJSONWebpackPlugin = require('../../src/index.ts');
 
 const rjInstance = new ResponsiveJSONWebpackPlugin({
-    sourceImages: "../examples/images",
-})
+    sourceImages: '../examples/images'
+});
 
-rjInstance.savePicture = jest.fn()
-rjInstance.savePicture.mockReturnValue(Promise.resolve())
-rjInstance.generateFileName = jest.fn()
-rjInstance.generateFileName.mockReturnValue("out.jpg")
+rjInstance.savePicture = jest.fn();
+rjInstance.savePicture.mockReturnValue(Promise.resolve());
+rjInstance.generateFileName = jest.fn();
+rjInstance.generateFileName.mockReturnValue('out.jpg');
 
 const source = {
-    extension: ".jpg",
+    extension: '.jpg',
     index: 0,
-    name: "basic",
+    name: 'basic',
     size: 16,
-    src: "basic.jpg",
-}
+    src: 'basic.jpg'
+};
 
-describe("parse source", () => {
-    test("raw source", () => {
-        expect(rjInstance.parseRawSource({
-            src: "sample-2.png",
-            dest: "herrso",
-            size: 16
-        })).toEqual({
-            extension: ".png",
-            name: "herrso",
+describe('parse source', () => {
+    test('raw source', () => {
+        expect(
+            rjInstance.parseRawSource({
+                src: 'sample-2.png',
+                dest: 'herrso',
+                size: 16
+            })
+        ).toEqual({
+            extension: '.png',
+            name: 'herrso',
             size: 16,
-            src: "sample-2.png"
-        })
+            src: 'sample-2.png'
+        });
 
-        expect(rjInstance.parseRawSource({
-            src: "sample-3.png",
+        expect(
+            rjInstance.parseRawSource({
+                src: 'sample-3.png',
+                size: 24
+            })
+        ).toEqual({
+            extension: '.png',
+            name: 'sample-3',
             size: 24,
-        })).toEqual({
-            extension: ".png",
-            name: "sample-3",
-            size: 24,
-            src: "sample-3.png"
-        })
-    })
+            src: 'sample-3.png'
+        });
+    });
 
-    test("embedded source", () => {
-        expect(rjInstance.parseSource(1, 0,
-            {
-                src: "basic.jpg",
+    test('embedded source', () => {
+        expect(
+            rjInstance.parseSource(1, 0, {
+                src: 'basic.jpg',
                 size: 16
-            }
-        )).toEqual(source)
+            })
+        ).toEqual(source);
 
-        expect(rjInstance.parseSource(1, 1,
-            {
-                src: "withDest.tiff",
+        expect(
+            rjInstance.parseSource(1, 1, {
+                src: 'withDest.tiff',
                 size: 16,
-                dest: "destination"
-            }
-        )).toEqual(
-            {
-                extension: ".tiff",
-                index: 0,
-                name: "destination",
-                size: 16,
-                src: "withDest.tiff",
-            }
-        )
+                dest: 'destination'
+            })
+        ).toEqual({
+            extension: '.tiff',
+            index: 0,
+            name: 'destination',
+            size: 16,
+            src: 'withDest.tiff'
+        });
 
-        expect(rjInstance.parseSource(3, 0,
-            {
-                src: "folder/inArray.jpg",
+        expect(
+            rjInstance.parseSource(3, 0, {
+                src: 'folder/inArray.jpg',
                 size: 16
-            }
-        )).toEqual(
-            {
-                extension: ".jpg",
-                index: 1,
-                name: "inArray",
-                size: 16,
-                src: "folder/inArray.jpg",
-            }
-        )
+            })
+        ).toEqual({
+            extension: '.jpg',
+            index: 1,
+            name: 'inArray',
+            size: 16,
+            src: 'folder/inArray.jpg'
+        });
 
-        expect(rjInstance.parseSource(2, 0,
-            {
-                src: "inArrayAlt.jpg",
-                size: 16
-            }
-            , "sample alt")).toEqual(
+        expect(
+            rjInstance.parseSource(
+                2,
+                0,
                 {
-                    extension: ".jpg",
-                    index: 1,
-                    name: "inArrayAlt",
-                    size: 16,
-                    src: "inArrayAlt.jpg",
-                    alt: "sample alt 1"
-                }
+                    src: 'inArrayAlt.jpg',
+                    size: 16
+                },
+                'sample alt'
             )
-    })
-})
+        ).toEqual({
+            extension: '.jpg',
+            index: 1,
+            name: 'inArrayAlt',
+            size: 16,
+            src: 'inArrayAlt.jpg',
+            alt: 'sample alt 1'
+        });
+    });
+});
 
-describe("create img", () => {
-    test("standard input", () => 
-        rjInstance.createImg(source, "potato").then(img => {
+describe('create img', () => {
+    test('standard input', () =>
+        rjInstance.createImg(source, 'potato').then(img => {
             const sampleImg = {
-                src: "out.jpg",
+                src: 'out.jpg',
                 size: 16,
                 alt: undefined
-            }
+            };
 
-            expect(img).toEqual(sampleImg)
+            expect(img).toEqual(sampleImg);
             expect(rjInstance.savePicture).toHaveBeenCalledWith(
-                "../examples/images/basic.jpg",
-                sampleImg   
-            )
-        })
-    )
-})
+                '../examples/images/basic.jpg',
+                sampleImg
+            );
+        }));
+});
 
-describe("picture img", () => {
-    test("none", () => rjInstance.createImgResolutions(source))
-    
-    test("empty", () => rjInstance.createImgResolutions(source, {}))
-    
-    test("standard", () => 
-        rjInstance.createImgResolutions(source, {
-            img: {
-                sizes: "XXL",
-                srcset: [
-                    {
-                        dest: "booty",
-                        size: 16
-                    },
-                    {
-                        dest: "bootybutt",
-                        size: 16
-                    }
-                ]
-            }
-        }).then(arr => {
-            expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
-                "../examples/images/basic.jpg",
-                { 
-                    src: "out.jpg", 
-                    size: 16 
-                }
-            )
+describe('picture img', () => {
+    test('none', () => rjInstance.createImgResolutions(source));
 
-            expect(arr).toEqual({
-                sizes: "XXL",
-                srcset: [
-                    { src: "out.jpg", size: 16 }, 
-                    { src: "out.jpg", size: 16 }
-                ]
-            })
-        })
-    )
-})
+    test('empty', () => rjInstance.createImgResolutions(source, {}));
 
-describe("picture sources", () => {
-    test("none", () => rjInstance.createPictureSources(source))
-
-    test("empty", () => rjInstance.createPictureSources(source, {}))
-    
-    test("standard", () =>
-        rjInstance.createPictureSources(source, {
-            sources: [
-                {
-                    sizes: "XXL",
-                    media: "SCREEN",
+    test('standard', () =>
+        rjInstance
+            .createImgResolutions(source, {
+                img: {
+                    sizes: 'XXL',
                     srcset: [
                         {
-                            src: "hm",
-                            dest: "booty",
+                            dest: 'booty',
                             size: 16
                         },
                         {
-                            src: "bootybutt",
+                            dest: 'bootybutt',
                             size: 16
                         }
                     ]
                 }
-            ]
-        }).then(arr => expect(arr[0]).toEqual(
-            {
-                media: "SCREEN",
-                sizes: "XXL",
-                srcset: [
-                    { src: "out.jpg", size: 16 }, 
-                    { src: "out.jpg", size: 16 }
+            })
+            .then(arr => {
+                expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
+                    '../examples/images/basic.jpg',
+                    {
+                        src: 'out.jpg',
+                        size: 16
+                    }
+                );
+
+                expect(arr).toEqual({
+                    sizes: 'XXL',
+                    srcset: [
+                        { src: 'out.jpg', size: 16 },
+                        { src: 'out.jpg', size: 16 }
+                    ]
+                });
+            }));
+});
+
+describe('picture sources', () => {
+    test('none', () => rjInstance.createPictureSources(source));
+
+    test('empty', () => rjInstance.createPictureSources(source, {}));
+
+    test('standard', () =>
+        rjInstance
+            .createPictureSources(source, {
+                sources: [
+                    {
+                        sizes: 'XXL',
+                        media: 'SCREEN',
+                        srcset: [
+                            {
+                                src: 'hm',
+                                dest: 'booty',
+                                size: 16
+                            },
+                            {
+                                src: 'bootybutt',
+                                size: 16
+                            }
+                        ]
+                    }
                 ]
-            }
-        ))
-    )
-})
+            })
+            .then(arr =>
+                expect(arr[0]).toEqual({
+                    media: 'SCREEN',
+                    sizes: 'XXL',
+                    srcset: [
+                        { src: 'out.jpg', size: 16 },
+                        { src: 'out.jpg', size: 16 }
+                    ]
+                })
+            ));
+});

@@ -26,17 +26,16 @@ type srcAlter = {
     dest: string;
     size: number;
 };
-type imageTemplateImg = {
-    sizes?: string;
-    srcset: Array<srcAlter>;
-};
 type imageTemplateSources = {
     media?: string;
     sizes?: string;
     srcset: Array<srcImg>;
 };
 type imageTemplate = {
-    img?: imageTemplateImg;
+    img?: {
+        sizes?: string;
+        srcset: Array<srcAlter>;
+    };
     sources?: Array<imageTemplateSources>;
 };
 
@@ -509,38 +508,48 @@ class ResponsiveJSONWebpackPlugin {
         fileDependencies,
         compiler: { context }
     }): Array<string> {
-        contextDependencies.add(
-            path.resolve(context, this.dirs.sourceTemplates)
-        );
         const dependencies = this.readFolderDependencies(
             this.dirs.sourceTemplates,
             context
         );
-        for (let file of dependencies) {
-            fileDependencies.add(path.resolve(file));
+        for (let file of dependencies.fileDependencies) {
+            fileDependencies.add(file);
         }
-        return dependencies;
+        for (let folder of dependencies.contextDependencies) {
+            contextDependencies.add(folder);
+        }
+        return dependencies.fileDependencies;
     }
 
     readFolderDependencies(
         dir: string,
         context: string,
-        dependencies: Array<string> = []
-    ): Array<string> {
+        fileDependencies: Array<string> = [],
+        contextDependencies: Array<string> = []
+    ): { fileDependencies: Array<string>; contextDependencies: Array<string> } {
+        contextDependencies.push(
+            path.resolve(context, dir).replace(this.slashRegex, '/')
+        );
+
         const list = fs.readdirSync(dir);
         list.forEach(file => {
             file = dir + '/' + file;
             const stat = fs.statSync(file);
             if (stat && stat.isDirectory()) {
-                this.readFolderDependencies(file, context, dependencies);
+                this.readFolderDependencies(
+                    file,
+                    context,
+                    fileDependencies,
+                    contextDependencies
+                );
             } else if (file.slice(file.lastIndexOf('.')) === '.json') {
-                dependencies.push(
+                fileDependencies.push(
                     path.resolve(context, file).replace(this.slashRegex, '/')
                 );
             }
         });
 
-        return dependencies;
+        return { fileDependencies, contextDependencies };
     }
 
     getChangedDependencies(fileDependencies) {
@@ -574,7 +583,7 @@ class ResponsiveJSONWebpackPlugin {
             } else if (
                 (group === this.dirs.dataPath ||
                     group === this.dirs.imagePath) &&
-                folder !== group.slice(0, group.length - 1)
+                this.getFirstSlash(folderFile) > 0
             ) {
                 folders[folder] = folders[folder]
                     ? folders[folder]

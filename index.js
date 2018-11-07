@@ -443,29 +443,34 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     };
     ResponsiveJSONWebpackPlugin.prototype.getDependencies = function (_a) {
         var contextDependencies = _a.contextDependencies, fileDependencies = _a.fileDependencies, context = _a.compiler.context;
-        contextDependencies.add(path_1["default"].resolve(context, this.dirs.sourceTemplates));
         var dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context);
-        for (var _i = 0, dependencies_1 = dependencies; _i < dependencies_1.length; _i++) {
-            var file = dependencies_1[_i];
-            fileDependencies.add(path_1["default"].resolve(file));
+        for (var _i = 0, _b = dependencies.fileDependencies; _i < _b.length; _i++) {
+            var file = _b[_i];
+            fileDependencies.add(file);
         }
-        return dependencies;
+        for (var _c = 0, _d = dependencies.contextDependencies; _c < _d.length; _c++) {
+            var folder = _d[_c];
+            contextDependencies.add(folder);
+        }
+        return dependencies.fileDependencies;
     };
-    ResponsiveJSONWebpackPlugin.prototype.readFolderDependencies = function (dir, context, dependencies) {
+    ResponsiveJSONWebpackPlugin.prototype.readFolderDependencies = function (dir, context, fileDependencies, contextDependencies) {
         var _this = this;
-        if (dependencies === void 0) { dependencies = []; }
+        if (fileDependencies === void 0) { fileDependencies = []; }
+        if (contextDependencies === void 0) { contextDependencies = []; }
+        contextDependencies.push(path_1["default"].resolve(context, dir).replace(this.slashRegex, '/'));
         var list = fs_extra_1["default"].readdirSync(dir);
         list.forEach(function (file) {
             file = dir + '/' + file;
             var stat = fs_extra_1["default"].statSync(file);
             if (stat && stat.isDirectory()) {
-                _this.readFolderDependencies(file, context, dependencies);
+                _this.readFolderDependencies(file, context, fileDependencies, contextDependencies);
             }
             else if (file.slice(file.lastIndexOf('.')) === '.json') {
-                dependencies.push(path_1["default"].resolve(context, file).replace(_this.slashRegex, '/'));
+                fileDependencies.push(path_1["default"].resolve(context, file).replace(_this.slashRegex, '/'));
             }
         });
-        return dependencies;
+        return { fileDependencies: fileDependencies, contextDependencies: contextDependencies };
     };
     ResponsiveJSONWebpackPlugin.prototype.getChangedDependencies = function (fileDependencies) {
         var _this = this;
@@ -491,7 +496,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             }
             else if ((group === _this.dirs.dataPath ||
                 group === _this.dirs.imagePath) &&
-                folder !== group.slice(0, group.length - 1)) {
+                _this.getFirstSlash(folderFile) > 0) {
                 folders[folder] = folders[folder]
                     ? folders[folder]
                     : {

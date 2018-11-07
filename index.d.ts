@@ -7,17 +7,16 @@ declare type srcAlter = {
     dest: string;
     size: number;
 };
-declare type imageTemplateImg = {
-    sizes?: string;
-    srcset: Array<srcAlter>;
-};
 declare type imageTemplateSources = {
     media?: string;
     sizes?: string;
     srcset: Array<srcImg>;
 };
 declare type imageTemplate = {
-    img?: imageTemplateImg;
+    img?: {
+        sizes?: string;
+        srcset: Array<srcAlter>;
+    };
     sources?: Array<imageTemplateSources>;
 };
 declare type srcEntry = {
@@ -101,7 +100,10 @@ declare class ResponsiveJSONWebpackPlugin {
             context: any;
         };
     }): Array<string>;
-    readFolderDependencies(dir: string, context: string, dependencies?: Array<string>): Array<string>;
+    readFolderDependencies(dir: string, context: string, fileDependencies?: Array<string>, contextDependencies?: Array<string>): {
+        fileDependencies: Array<string>;
+        contextDependencies: Array<string>;
+    };
     getChangedDependencies(fileDependencies: any): {
         folders: {};
         files: {};
