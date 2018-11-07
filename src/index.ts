@@ -13,6 +13,7 @@ const responsiveValidate = ajv.compile(responsiveSchema);
 type directoryOptions = {
     dataPath: string;
     imagePath: string;
+    rawFolder: string;
     sourceTemplates: string;
     sourceImages: string;
     outputFolder: string;
@@ -75,6 +76,7 @@ class ResponsiveJSONWebpackPlugin {
     constructor({
         dataPath = 'data',
         imagePath = 'images',
+        rawFolder = 'raw',
         sourceTemplates = 'src/assets/templates',
         sourceImages = 'src/assets/images',
         outputFolder = 'assets'
@@ -82,6 +84,7 @@ class ResponsiveJSONWebpackPlugin {
         this.dirs = this.options = {
             dataPath,
             imagePath,
+            rawFolder,
             sourceTemplates,
             sourceImages,
             outputFolder
@@ -575,7 +578,7 @@ class ResponsiveJSONWebpackPlugin {
             );
 
             const time = fs.statSync(rawFileName).mtime.getTime();
-            if (folderFile === 'raw') {
+            if (folderFile === this.dirs.rawFolder) {
                 if (this.direct[rawFileName] !== time) {
                     changedDirectFiles.push(fileName);
                 }

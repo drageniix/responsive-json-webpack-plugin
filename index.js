@@ -59,7 +59,7 @@ var rawValidate = ajv.compile(raw_file_json_1["default"]);
 var responsiveValidate = ajv.compile(responsive_json_1["default"]);
 var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     function ResponsiveJSONWebpackPlugin(_a) {
-        var _b = _a === void 0 ? {} : _a, _c = _b.dataPath, dataPath = _c === void 0 ? 'data' : _c, _d = _b.imagePath, imagePath = _d === void 0 ? 'images' : _d, _e = _b.sourceTemplates, sourceTemplates = _e === void 0 ? 'src/assets/templates' : _e, _f = _b.sourceImages, sourceImages = _f === void 0 ? 'src/assets/images' : _f, _g = _b.outputFolder, outputFolder = _g === void 0 ? 'assets' : _g;
+        var _b = _a === void 0 ? {} : _a, _c = _b.dataPath, dataPath = _c === void 0 ? 'data' : _c, _d = _b.imagePath, imagePath = _d === void 0 ? 'images' : _d, _e = _b.rawFolder, rawFolder = _e === void 0 ? 'raw' : _e, _f = _b.sourceTemplates, sourceTemplates = _f === void 0 ? 'src/assets/templates' : _f, _g = _b.sourceImages, sourceImages = _g === void 0 ? 'src/assets/images' : _g, _h = _b.outputFolder, outputFolder = _h === void 0 ? 'assets' : _h;
         this.slashRegex = new RegExp(/\\/, 'g');
         this.folders = {};
         this.files = {};
@@ -67,6 +67,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
         this.dirs = this.options = {
             dataPath: dataPath,
             imagePath: imagePath,
+            rawFolder: rawFolder,
             sourceTemplates: sourceTemplates,
             sourceImages: sourceImages,
             outputFolder: outputFolder
@@ -488,7 +489,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             var group = folderFile.slice(_this.getFirstSlash(folderFile) + 1);
             var fileName = rawFileName.slice(_this.getLastSlash(rawFileName) + 1, rawFileName.lastIndexOf('.'));
             var time = fs_extra_1["default"].statSync(rawFileName).mtime.getTime();
-            if (folderFile === 'raw') {
+            if (folderFile === _this.dirs.rawFolder) {
                 if (_this.direct[rawFileName] !== time) {
                     changedDirectFiles.push(fileName);
                 }

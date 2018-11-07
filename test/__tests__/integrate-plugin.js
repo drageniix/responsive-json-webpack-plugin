@@ -31,6 +31,7 @@ test('run', () => {
             expect(rjInstance.dirs).toEqual({
                 dataPath: 'data',
                 imagePath: 'images',
+                rawFolder: 'raw',
                 sourceTemplates:
                     'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/__tests__/src/assets/templates',
                 sourceImages:

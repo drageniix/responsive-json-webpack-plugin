@@ -48,9 +48,10 @@ declare class ResponsiveJSONWebpackPlugin {
     private files;
     private direct;
     private assets;
-    constructor({ dataPath, imagePath, sourceTemplates, sourceImages, outputFolder }?: {
+    constructor({ dataPath, imagePath, rawFolder, sourceTemplates, sourceImages, outputFolder }?: {
         dataPath?: string;
         imagePath?: string;
+        rawFolder?: string;
         sourceTemplates?: string;
         sourceImages?: string;
         outputFolder?: string;
