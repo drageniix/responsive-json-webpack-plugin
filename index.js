@@ -89,6 +89,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                             .resolve(compilation.compiler.context, this.options.sourceImages)
                             .replace(this.slashRegex, '/');
                         this.establishedDependencies = this.getDependencies(compilation);
+                        console.log(compilation.fileDependencies, "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", compilation.contextDependencies);
                         return [4 /*yield*/, this.processDataFolders(this.establishedDependencies.changedFolders)];
                     case 1:
                         _a.sent();
@@ -442,11 +443,11 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
         var _b = this.readFolderDependencies(this.dirs.sourceTemplates, compiler.context), localFileDependencies = _b.fileDependencies, localContextDependencies = _b.contextDependencies;
         for (var _i = 0, localFileDependencies_1 = localFileDependencies; _i < localFileDependencies_1.length; _i++) {
             var file = localFileDependencies_1[_i];
-            fileDependencies.add(file);
+            fileDependencies.add(path_1["default"].resolve(file));
         }
         for (var _c = 0, localContextDependencies_1 = localContextDependencies; _c < localContextDependencies_1.length; _c++) {
             var folder = localContextDependencies_1[_c];
-            contextDependencies.add(folder);
+            contextDependencies.add(path_1["default"].resolve(folder));
         }
         return __assign({ fileDependencies: localFileDependencies, contextDependencies: localContextDependencies }, this.getChangedDependencies(localFileDependencies));
     };

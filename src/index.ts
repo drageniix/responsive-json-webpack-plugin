@@ -106,7 +106,7 @@ class ResponsiveJSONWebpackPlugin {
             .replace(this.slashRegex, '/');
 
         this.establishedDependencies = this.getDependencies(compilation);
-
+        console.log(compilation.fileDependencies, "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",compilation.contextDependencies)
         await this.processDataFolders(
             this.establishedDependencies.changedFolders
         );
@@ -525,10 +525,10 @@ class ResponsiveJSONWebpackPlugin {
         );
 
         for (let file of localFileDependencies) {
-            fileDependencies.add(file);
+            fileDependencies.add(path.resolve(file));
         }
         for (let folder of localContextDependencies) {
-            contextDependencies.add(folder);
+            contextDependencies.add(path.resolve(folder));
         }
 
         return {
