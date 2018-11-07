@@ -106,7 +106,6 @@ class ResponsiveJSONWebpackPlugin {
             .replace(this.slashRegex, '/');
 
         this.establishedDependencies = this.getDependencies(compilation);
-        console.log(compilation.fileDependencies, "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",compilation.contextDependencies)
         await this.processDataFolders(
             this.establishedDependencies.changedFolders
         );

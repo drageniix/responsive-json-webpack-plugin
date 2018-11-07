@@ -89,7 +89,6 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                             .resolve(compilation.compiler.context, this.options.sourceImages)
                             .replace(this.slashRegex, '/');
                         this.establishedDependencies = this.getDependencies(compilation);
-                        console.log(compilation.fileDependencies, "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", compilation.contextDependencies);
                         return [4 /*yield*/, this.processDataFolders(this.establishedDependencies.changedFolders)];
                     case 1:
                         _a.sent();
