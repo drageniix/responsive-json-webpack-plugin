@@ -61,9 +61,11 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     function ResponsiveJSONWebpackPlugin(_a) {
         var _b = _a === void 0 ? {} : _a, _c = _b.dataPath, dataPath = _c === void 0 ? 'data' : _c, _d = _b.imagePath, imagePath = _d === void 0 ? 'images' : _d, _e = _b.rawFolder, rawFolder = _e === void 0 ? 'raw' : _e, _f = _b.sourceTemplates, sourceTemplates = _f === void 0 ? 'src/assets/templates' : _f, _g = _b.sourceImages, sourceImages = _g === void 0 ? 'src/assets/images' : _g, _h = _b.outputFolder, outputFolder = _h === void 0 ? 'assets' : _h;
         this.slashRegex = new RegExp(/\\/, 'g');
-        this.folders = {};
-        this.files = {};
-        this.direct = {};
+        this.establishedDependencies = {
+            folders: {},
+            files: {},
+            direct: {}
+        };
         this.dirs = this.options = {
             dataPath: dataPath,
             imagePath: imagePath,
@@ -75,30 +77,25 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     }
     ResponsiveJSONWebpackPlugin.prototype.run = function (compilation) {
         return __awaiter(this, void 0, void 0, function () {
-            var dependencies, processedDependencies;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        this.processedFileNames = [];
+                        this.assets = compilation.assets;
                         this.dirs.sourceTemplates = path_1["default"]
                             .resolve(compilation.compiler.context, this.options.sourceTemplates)
                             .replace(this.slashRegex, '/');
                         this.dirs.sourceImages = path_1["default"]
                             .resolve(compilation.compiler.context, this.options.sourceImages)
                             .replace(this.slashRegex, '/');
-                        dependencies = this.getDependencies(compilation);
-                        processedDependencies = this.getChangedDependencies(dependencies);
-                        this.processedFileNames = [];
-                        this.assets = compilation.assets;
-                        this.folders = processedDependencies.folders;
-                        this.files = processedDependencies.files;
-                        this.direct = processedDependencies.direct;
-                        return [4 /*yield*/, this.processDataFolders(processedDependencies.changedFolders)];
+                        this.establishedDependencies = this.getDependencies(compilation);
+                        return [4 /*yield*/, this.processDataFolders(this.establishedDependencies.changedFolders)];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, this.processRawFiles(processedDependencies.changedPureFiles)];
+                        return [4 /*yield*/, this.processRawFiles(this.establishedDependencies.changedPureFiles)];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, this.processDirectFiles(processedDependencies.changedDirectFiles)];
+                        return [4 /*yield*/, this.processDirectFiles(this.establishedDependencies.changedDirectFiles)];
                     case 3:
                         _a.sent();
                         return [2 /*return*/];
@@ -204,9 +201,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     };
     ResponsiveJSONWebpackPlugin.prototype.processDataFiles = function (folder) {
         var _this = this;
-        var dataFiles = this.folders[folder].filenames.filter(function (name) {
-            return name.startsWith(_this.dirs.dataPath);
-        });
+        var dataFiles = this.establishedDependencies.folders[folder].filenames.filter(function (name) { return name.startsWith(_this.dirs.dataPath); });
         return Promise.all(dataFiles.map(function (file) {
             return fs_extra_1["default"]
                 .readJSON(_this.dirs.sourceTemplates + "/" + folder + "/" + file)
@@ -228,7 +223,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         imageFile = file.replace(this.dirs.dataPath, this.dirs.imagePath);
-                        if (!this.folders[folder].filenames.includes(imageFile)) return [3 /*break*/, 4];
+                        if (!this.establishedDependencies.folders[folder].filenames.includes(imageFile)) return [3 /*break*/, 4];
                         return [4 /*yield*/, fs_extra_1["default"].readJSON(this.dirs.sourceTemplates + "/" + folder + "/" + imageFile)];
                     case 1:
                         images = _a.sent();
@@ -443,17 +438,17 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             return this.index(obj[isNaN(objPath[0]) ? objPath[0] : parseInt(objPath[0])], objPath.slice(1), value);
     };
     ResponsiveJSONWebpackPlugin.prototype.getDependencies = function (_a) {
-        var contextDependencies = _a.contextDependencies, fileDependencies = _a.fileDependencies, context = _a.compiler.context;
-        var dependencies = this.readFolderDependencies(this.dirs.sourceTemplates, context);
-        for (var _i = 0, _b = dependencies.fileDependencies; _i < _b.length; _i++) {
-            var file = _b[_i];
+        var contextDependencies = _a.contextDependencies, fileDependencies = _a.fileDependencies, compiler = _a.compiler;
+        var _b = this.readFolderDependencies(this.dirs.sourceTemplates, compiler.context), localFileDependencies = _b.fileDependencies, localContextDependencies = _b.contextDependencies;
+        for (var _i = 0, localFileDependencies_1 = localFileDependencies; _i < localFileDependencies_1.length; _i++) {
+            var file = localFileDependencies_1[_i];
             fileDependencies.add(file);
         }
-        for (var _c = 0, _d = dependencies.contextDependencies; _c < _d.length; _c++) {
-            var folder = _d[_c];
+        for (var _c = 0, localContextDependencies_1 = localContextDependencies; _c < localContextDependencies_1.length; _c++) {
+            var folder = localContextDependencies_1[_c];
             contextDependencies.add(folder);
         }
-        return dependencies.fileDependencies;
+        return __assign({ fileDependencies: localFileDependencies, contextDependencies: localContextDependencies }, this.getChangedDependencies(localFileDependencies));
     };
     ResponsiveJSONWebpackPlugin.prototype.readFolderDependencies = function (dir, context, fileDependencies, contextDependencies) {
         var _this = this;
@@ -490,7 +485,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             var fileName = rawFileName.slice(_this.getLastSlash(rawFileName) + 1, rawFileName.lastIndexOf('.'));
             var time = fs_extra_1["default"].statSync(rawFileName).mtime.getTime();
             if (folderFile === _this.dirs.rawFolder) {
-                if (_this.direct[rawFileName] !== time) {
+                if (_this.establishedDependencies.direct[rawFileName] !== time) {
                     changedDirectFiles.push(fileName);
                 }
                 direct[rawFileName] = time;
@@ -508,7 +503,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                 folders[folder].filenames.push(rawFileName.slice(rawFileName.lastIndexOf(group)));
             }
             else {
-                if (_this.files[rawFileName] !== time) {
+                if (_this.establishedDependencies.files[rawFileName] !== time) {
                     changedPureFiles.push(rawFileName);
                 }
                 files[rawFileName] = time;
@@ -518,9 +513,10 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             folders[folder].lastUpdate = folders[folder].lastUpdate
                 .sort()
                 .reverse()[0];
-            if (!this.folders[folder] ||
-                this.folders[folder].lastUpdate < folders[folder].lastUpdate ||
-                this.folders[folder].filenames.length !=
+            if (!this.establishedDependencies.folders[folder] ||
+                this.establishedDependencies.folders[folder].lastUpdate <
+                    folders[folder].lastUpdate ||
+                this.establishedDependencies.folders[folder].filenames.length !=
                     folders[folder].filenames.length) {
                 changedFolders.add(folder);
             }

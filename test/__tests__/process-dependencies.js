@@ -32,26 +32,13 @@ describe('Dependencies', () => {
 
         expect(fileDependencies).toHaveLength(8);
         expect(contextDependencies).toHaveLength(7);
+        
         expect(
             rjInstance.readFolderDependencies(
                 rjInstance.dirs.sourceTemplates,
                 compilation.compiler.context
             )
         ).toEqual({ fileDependencies, contextDependencies });
-    });
-
-    test('get fileDependencies', () => {
-        rjInstance.readFolderDependencies = jest.fn();
-        rjInstance.readFolderDependencies.mockReturnValue({
-            fileDependencies,
-            contextDependencies
-        });
-
-        expect(rjInstance.getDependencies(compilation)).toBe(fileDependencies);
-        expect(compilation.contextDependencies.size).toBe(
-            contextDependencies.length
-        );
-        expect(compilation.fileDependencies.size).toBe(fileDependencies.length);
     });
 
     test('new fileDependencies', () => {
@@ -94,7 +81,7 @@ describe('Dependencies', () => {
     });
 
     test('changed fileDependencies', () => {
-        rjInstance.folders = {
+        rjInstance.establishedDependencies.folders = {
             index: {
                 lastUpdate: 1540079321855,
                 filenames: [
@@ -105,7 +92,7 @@ describe('Dependencies', () => {
                 ]
             }
         };
-        rjInstance.files = {
+        rjInstance.establishedDependencies.files = {
             'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json': 1539124763943
         };
 
@@ -145,4 +132,28 @@ describe('Dependencies', () => {
             }
         });
     });
+
+    
+    test('get fileDependencies', () => {
+        const changedDeps = {test: undefined}
+        rjInstance.readFolderDependencies = jest.fn();
+        rjInstance.readFolderDependencies.mockReturnValue({
+            fileDependencies,
+            contextDependencies
+        });
+        rjInstance.getChangedDependencies = jest.fn();
+        rjInstance.getChangedDependencies.mockReturnValue(changedDeps);
+
+        expect(rjInstance.getDependencies(compilation)).toEqual({
+            fileDependencies,
+            contextDependencies,
+            ...changedDeps
+        });
+
+        expect(compilation.contextDependencies.size).toBe(
+            contextDependencies.length
+        );
+        expect(compilation.fileDependencies.size).toBe(fileDependencies.length);
+    });
+
 });

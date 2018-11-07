@@ -9,7 +9,7 @@ const rjInstance = new ResponsiveJSONWebpackPlugin({
         'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/__tests__/examples/output'
 });
 
-rjInstance.folders = {
+rjInstance.establishedDependencies.folders = {
     index: {
         filenames: [
             'data/icons.json',

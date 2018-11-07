@@ -2,7 +2,7 @@
 
 [![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/react.svg)](https://www.npmjs.com/package/responsive-json-webpack-plugin)
 
-Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired. Uses sharp and fs-extra. **100% Test Coverage**!
+Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired. Uses sharp and fs-extra. **100% Test Coverage**! _Requires Webpack 4._
 
 ## Install
 
@@ -10,7 +10,7 @@ Set resizing instructions in JSON, can also output combined JSON with responsive
 npm install responsive-json-webpack-plugin
 ```
 
-#### webpack.config.js
+#### webpack.config.js (Webpack 4)
 
 ```javascript
 const ResponsiveJSONWebpackPlugin = require("responsive-json-webpack-plugin")

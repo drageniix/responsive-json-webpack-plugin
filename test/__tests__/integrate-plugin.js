@@ -7,18 +7,13 @@ test('apply', () => {
 });
 
 test('run', () => {
-    rjInstance.getDependencies = jest.fn();
-    rjInstance.getChangedDependencies = jest.fn();
-    rjInstance.getChangedDependencies.mockReturnValue({
-        folders: {},
-        files: {},
-        changedFolders: [],
-        changedPureFiles: []
-    });
+    const deps = {}
 
     rjInstance.processDataFolders = jest.fn();
     rjInstance.processRawFiles = jest.fn();
     rjInstance.processDirectFiles = jest.fn();
+    rjInstance.getDependencies = jest.fn();
+    rjInstance.getDependencies.mockReturnValue(deps);
 
     return rjInstance
         .run({
@@ -28,6 +23,7 @@ test('run', () => {
             compiler: { context: __dirname }
         })
         .then(() => {
+            expect(rjInstance.establishedDependencies).toBe(deps);
             expect(rjInstance.dirs).toEqual({
                 dataPath: 'data',
                 imagePath: 'images',

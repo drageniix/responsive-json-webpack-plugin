@@ -27,17 +27,16 @@ type srcAlter = {
     dest: string;
     size: number;
 };
-type imageTemplateSources = {
-    media?: string;
-    sizes?: string;
-    srcset: Array<srcImg>;
-};
 type imageTemplate = {
     img?: {
         sizes?: string;
         srcset: Array<srcAlter>;
     };
-    sources?: Array<imageTemplateSources>;
+    sources?: Array<{
+        media?: string;
+        sizes?: string;
+        srcset: Array<srcImg>;
+    }>;
 };
 
 type srcEntry = {
@@ -68,9 +67,12 @@ class ResponsiveJSONWebpackPlugin {
     private dirs: directoryOptions;
     private slashRegex: RegExp = new RegExp(/\\/, 'g');
     private processedFileNames: Array<string>;
-    private folders: object = {};
-    private files: object = {};
-    private direct: object = {};
+    private establishedDependencies: any = {
+        folders: {},
+        files: {},
+        direct: {}
+    };
+
     private assets: object;
 
     constructor({
@@ -92,25 +94,28 @@ class ResponsiveJSONWebpackPlugin {
     }
 
     async run(compilation) {
+        this.processedFileNames = [];
+        this.assets = compilation.assets;
+
         this.dirs.sourceTemplates = path
             .resolve(compilation.compiler.context, this.options.sourceTemplates)
             .replace(this.slashRegex, '/');
+
         this.dirs.sourceImages = path
             .resolve(compilation.compiler.context, this.options.sourceImages)
             .replace(this.slashRegex, '/');
 
-        const dependencies = this.getDependencies(compilation);
-        const processedDependencies = this.getChangedDependencies(dependencies);
+        this.establishedDependencies = this.getDependencies(compilation);
 
-        this.processedFileNames = [];
-        this.assets = compilation.assets;
-        this.folders = processedDependencies.folders;
-        this.files = processedDependencies.files;
-        this.direct = processedDependencies.direct;
-
-        await this.processDataFolders(processedDependencies.changedFolders);
-        await this.processRawFiles(processedDependencies.changedPureFiles);
-        await this.processDirectFiles(processedDependencies.changedDirectFiles);
+        await this.processDataFolders(
+            this.establishedDependencies.changedFolders
+        );
+        await this.processRawFiles(
+            this.establishedDependencies.changedPureFiles
+        );
+        await this.processDirectFiles(
+            this.establishedDependencies.changedDirectFiles
+        );
     }
 
     apply(compiler) {
@@ -238,9 +243,9 @@ class ResponsiveJSONWebpackPlugin {
     }
 
     processDataFiles(folder: string) {
-        const dataFiles = this.folders[folder].filenames.filter(name =>
-            name.startsWith(this.dirs.dataPath)
-        );
+        const dataFiles = this.establishedDependencies.folders[
+            folder
+        ].filenames.filter(name => name.startsWith(this.dirs.dataPath));
 
         return Promise.all(
             dataFiles.map(file =>
@@ -263,7 +268,11 @@ class ResponsiveJSONWebpackPlugin {
 
     async checkImageFile(folder, file, data) {
         const imageFile = file.replace(this.dirs.dataPath, this.dirs.imagePath);
-        if (this.folders[folder].filenames.includes(imageFile)) {
+        if (
+            this.establishedDependencies.folders[folder].filenames.includes(
+                imageFile
+            )
+        ) {
             const images = await fs.readJSON(
                 `${this.dirs.sourceTemplates}/${folder}/${imageFile}`
             );
@@ -506,22 +515,27 @@ class ResponsiveJSONWebpackPlugin {
             );
     }
 
-    getDependencies({
-        contextDependencies,
-        fileDependencies,
-        compiler: { context }
-    }): Array<string> {
-        const dependencies = this.readFolderDependencies(
+    getDependencies({ contextDependencies, fileDependencies, compiler }) {
+        const {
+            fileDependencies: localFileDependencies,
+            contextDependencies: localContextDependencies
+        } = this.readFolderDependencies(
             this.dirs.sourceTemplates,
-            context
+            compiler.context
         );
-        for (let file of dependencies.fileDependencies) {
+
+        for (let file of localFileDependencies) {
             fileDependencies.add(file);
         }
-        for (let folder of dependencies.contextDependencies) {
+        for (let folder of localContextDependencies) {
             contextDependencies.add(folder);
         }
-        return dependencies.fileDependencies;
+
+        return {
+            fileDependencies: localFileDependencies,
+            contextDependencies: localContextDependencies,
+            ...this.getChangedDependencies(localFileDependencies)
+        };
     }
 
     readFolderDependencies(
@@ -529,7 +543,7 @@ class ResponsiveJSONWebpackPlugin {
         context: string,
         fileDependencies: Array<string> = [],
         contextDependencies: Array<string> = []
-    ): { fileDependencies: Array<string>; contextDependencies: Array<string> } {
+    ) {
         contextDependencies.push(
             path.resolve(context, dir).replace(this.slashRegex, '/')
         );
@@ -579,7 +593,7 @@ class ResponsiveJSONWebpackPlugin {
 
             const time = fs.statSync(rawFileName).mtime.getTime();
             if (folderFile === this.dirs.rawFolder) {
-                if (this.direct[rawFileName] !== time) {
+                if (this.establishedDependencies.direct[rawFileName] !== time) {
                     changedDirectFiles.push(fileName);
                 }
                 direct[rawFileName] = time;
@@ -600,7 +614,7 @@ class ResponsiveJSONWebpackPlugin {
                     rawFileName.slice(rawFileName.lastIndexOf(group))
                 );
             } else {
-                if (this.files[rawFileName] !== time) {
+                if (this.establishedDependencies.files[rawFileName] !== time) {
                     changedPureFiles.push(rawFileName);
                 }
                 files[rawFileName] = time;
@@ -612,9 +626,10 @@ class ResponsiveJSONWebpackPlugin {
                 .sort()
                 .reverse()[0];
             if (
-                !this.folders[folder] ||
-                this.folders[folder].lastUpdate < folders[folder].lastUpdate ||
-                this.folders[folder].filenames.length !=
+                !this.establishedDependencies.folders[folder] ||
+                this.establishedDependencies.folders[folder].lastUpdate <
+                    folders[folder].lastUpdate ||
+                this.establishedDependencies.folders[folder].filenames.length !=
                     folders[folder].filenames.length
             ) {
                 changedFolders.add(folder);

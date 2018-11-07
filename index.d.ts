@@ -7,17 +7,16 @@ declare type srcAlter = {
     dest: string;
     size: number;
 };
-declare type imageTemplateSources = {
-    media?: string;
-    sizes?: string;
-    srcset: Array<srcImg>;
-};
 declare type imageTemplate = {
     img?: {
         sizes?: string;
         srcset: Array<srcAlter>;
     };
-    sources?: Array<imageTemplateSources>;
+    sources?: Array<{
+        media?: string;
+        sizes?: string;
+        srcset: Array<srcImg>;
+    }>;
 };
 declare type srcEntry = {
     path: string;
@@ -44,9 +43,7 @@ declare class ResponsiveJSONWebpackPlugin {
     private dirs;
     private slashRegex;
     private processedFileNames;
-    private folders;
-    private files;
-    private direct;
+    private establishedDependencies;
     private assets;
     constructor({ dataPath, imagePath, rawFolder, sourceTemplates, sourceImages, outputFolder }?: {
         dataPath?: string;
@@ -94,16 +91,23 @@ declare class ResponsiveJSONWebpackPlugin {
         extension?: string;
     }, dest?: any): string;
     index(obj: object, objPath: string | Array<string>, value: any): any;
-    getDependencies({ contextDependencies, fileDependencies, compiler: { context } }: {
+    getDependencies({ contextDependencies, fileDependencies, compiler }: {
         contextDependencies: any;
         fileDependencies: any;
-        compiler: {
-            context: any;
-        };
-    }): Array<string>;
+        compiler: any;
+    }): {
+        folders: {};
+        files: {};
+        direct: {};
+        changedFolders: any[];
+        changedPureFiles: any[];
+        changedDirectFiles: any[];
+        fileDependencies: string[];
+        contextDependencies: string[];
+    };
     readFolderDependencies(dir: string, context: string, fileDependencies?: Array<string>, contextDependencies?: Array<string>): {
-        fileDependencies: Array<string>;
-        contextDependencies: Array<string>;
+        fileDependencies: string[];
+        contextDependencies: string[];
     };
     getChangedDependencies(fileDependencies: any): {
         folders: {};
