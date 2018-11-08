@@ -2,12 +2,15 @@
 
 [![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/react.svg)](https://www.npmjs.com/package/responsive-json-webpack-plugin)
 
-Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired. Uses sharp and fs-extra. **100% Test Coverage**! _Requires Webpack 4._
+Set resizing instructions in JSON, can also output combined JSON with responsive image attributes (picture, sources, srcset, sizes, media) included where desired. Uses [sharp](https://www.npmjs.com/package/sharp). **100% Test Coverage**! _Requires Webpack 4._
 
 ## Install
 
 ```
 npm install responsive-json-webpack-plugin
+
+
+
 ```
 
 #### webpack.config.js (Webpack 4)
@@ -15,15 +18,48 @@ npm install responsive-json-webpack-plugin
 ```javascript
 const ResponsiveJSONWebpackPlugin = require("responsive-json-webpack-plugin")
 
+
+
+
+
+
+
 {
+
+
+
     plugins: [
+
+
+
         new ResponsiveJSONWebpackPlugin({
+
+
+
             sourceTemplates = "src/assets/templates" //default
+
+
+
             sourceImages = "src/assets/images", //default
+
+
+
             outputFolder = "assets" //default
+
+
+
         })
+
+
+
     ]
+
+
+
 }
+
+
+
 ```
 
 # As JSON copier
@@ -298,10 +334,15 @@ Which will output:
 
 # React
 
-You can use the resulting json directly with React. You may also provide an image path via the imagePath `prop`, which defaults to `/` and should end in `/`.
+You can use the resulting json directly with React.
 
 ```javascript
 import ResponsiveImage from 'responsive-json-webpack-plugin/react'
 
+
+
 <ResponsiveImage image={outputJSON.imagePath} className="" alt="" />
+
+
+
 ```

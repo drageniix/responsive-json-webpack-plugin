@@ -1,0 +1,76 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "title": "Raw File Resizing JSON",
+    "items": {
+        "type": "object",
+        "title": "Set of Resize Instructions",
+        "required": [
+            "files"
+        ],
+        "properties": {
+            "files": {
+                "type": "array",
+                "title": "Files to Process",
+                "items": {
+                    "type": "object",
+                    "title": "File",
+                    "required": [
+                        "src"
+                    ],
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "title": "Filepath",
+                            "default": "",
+                            "pattern": "^(.*)$"
+                        },
+                        "dest": {
+                            "type": "string",
+                            "title": "Output Filename",
+                            "default": "",
+                            "pattern": "^(.*)$"
+                        },
+                        "size": {
+                            "type": "integer",
+                            "title": "Desired Width of Image",
+                            "default": 0
+                        }
+                    }
+                }
+            },
+            "alternates": {
+                "type": "array",
+                "title": "The Alternates Schema",
+                "items": {
+                    "type": "object",
+                    "title": "File",
+                    "required": [
+                        "dest",
+                        "size"
+                    ],
+                    "properties": {
+                        "src": {
+                            "type": "string",
+                            "title": "Filepath",
+                            "default": "",
+                            "pattern": "^(.*)$"
+                        },
+                        "dest": {
+                            "type": "string",
+                            "title": "Output Filename",
+                            "default": "",
+                            "pattern": "^(.*)$"
+                        },
+                        "size": {
+                            "type": "integer",
+                            "title": "Desired Width of Image",
+                            "default": 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

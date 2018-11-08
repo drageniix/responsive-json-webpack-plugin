@@ -124,6 +124,10 @@ class ResponsiveJSONWebpackPlugin {
         );
     }
 
+    readJSON(file) {
+        return fs.readJSON(file);
+    }
+
     saveJSON(folder: string, jsonMap: Array<object>) {
         const stringData = JSON.stringify(Object.assign({}, ...jsonMap));
         this.assets[
@@ -160,9 +164,13 @@ class ResponsiveJSONWebpackPlugin {
     processDirectFiles(dataFiles: Array<string>) {
         return Promise.all(
             dataFiles.map(file =>
-                fs
-                    .readJSON(`${this.dirs.sourceTemplates}/raw/${file}.json`)
+                this.readJSON(`${this.dirs.sourceTemplates}/raw/${file}.json`)
                     .then(data => this.saveJSON(file, [data]))
+                    .catch(err => {
+                        console.error(
+                            `ResponsiveJSONWebpackPlugin ${err} --"${file}"`
+                        );
+                    })
             )
         );
     }
@@ -170,33 +178,41 @@ class ResponsiveJSONWebpackPlugin {
     processRawFiles(dataFiles: Array<string>) {
         return Promise.all(
             dataFiles.map(file =>
-                fs.readJSON(file).then(data => {
-                    const valid = rawValidate(data);
-                    if (valid) {
-                        return Promise.all(
-                            data.map(
-                                ({
-                                    files,
-                                    alternates
-                                }: {
-                                    files: Array<srcImg>;
-                                    alternates?: Array<srcAlter>;
-                                }) => this.processRawItem(files, alternates)
-                            )
-                        );
-                    } else {
-                        console.error(
-                            `ResponsiveJSONWebpackPlugin: ${file}`,
-                            '\n',
-                            rawValidate.errors
-                                .map(
-                                    err =>
-                                        `path '${err.dataPath}' ${err.message}`
+                this.readJSON(file)
+                    .then(data => {
+                        const valid = rawValidate(data);
+                        if (valid) {
+                            return Promise.all(
+                                data.map(
+                                    ({
+                                        files,
+                                        alternates
+                                    }: {
+                                        files: Array<srcImg>;
+                                        alternates?: Array<srcAlter>;
+                                    }) => this.processRawItem(files, alternates)
                                 )
-                                .join(', ')
+                            );
+                        } else {
+                            console.error(
+                                `ResponsiveJSONWebpackPlugin: ${file}`,
+                                '\n',
+                                rawValidate.errors
+                                    .map(
+                                        err =>
+                                            `path '${err.dataPath}' ${
+                                                err.message
+                                            }`
+                                    )
+                                    .join(', ')
+                            );
+                        }
+                    })
+                    .catch(err => {
+                        console.error(
+                            `ResponsiveJSONWebpackPlugin ${err} --"${file}"`
                         );
-                    }
-                })
+                    })
             )
         );
     }
@@ -248,8 +264,7 @@ class ResponsiveJSONWebpackPlugin {
 
         return Promise.all(
             dataFiles.map(file =>
-                fs
-                    .readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
+                this.readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
                     .then(data => this.checkImageFile(folder, file, data))
                     .then(data => {
                         const fileKey = file.replace(
@@ -260,6 +275,11 @@ class ResponsiveJSONWebpackPlugin {
                             ? fileKey.substring(1, fileKey.lastIndexOf('.'))
                             : fileKey.substring(0, fileKey.lastIndexOf('.'));
                         return { [jsonKey]: data };
+                    })
+                    .catch(err => {
+                        console.error(
+                            `ResponsiveJSONWebpackPlugin ${err} --"${file}"`
+                        );
                     })
             )
         );
@@ -272,19 +292,23 @@ class ResponsiveJSONWebpackPlugin {
                 imageFile
             )
         ) {
-            const images = await fs.readJSON(
-                `${this.dirs.sourceTemplates}/${folder}/${imageFile}`
-            );
-            if (responsiveValidate(images)) {
-                await this.injectImagesIntoDataFile(images, data);
-            } else {
-                console.error(
-                    `ResponsiveJSONWebpackPlugin: ${file}`,
-                    '\n',
-                    responsiveValidate.errors
-                        .map(err => `path '${err.dataPath}' ${err.message}`)
-                        .join(', ')
+            try {
+                const images = await this.readJSON(
+                    `${this.dirs.sourceTemplates}/${folder}/${imageFile}`
                 );
+                if (responsiveValidate(images)) {
+                    await this.injectImagesIntoDataFile(images, data);
+                } else {
+                    console.error(
+                        `ResponsiveJSONWebpackPlugin: ${file}`,
+                        '\n',
+                        responsiveValidate.errors
+                            .map(err => `path '${err.dataPath}' ${err.message}`)
+                            .join(', ')
+                    );
+                }
+            } catch (err) {
+                console.error(`ResponsiveJSONWebpackPlugin ${err} --"${file}"`);
             }
         }
         return data;
@@ -292,27 +316,25 @@ class ResponsiveJSONWebpackPlugin {
 
     injectImagesIntoDataFile(images: Array<srcEntry>, data: object) {
         return Promise.all(
-            images.map(
-                entry =>
-                    entry.set
-                        ? Promise.all(
-                              entry.set.map(async (item, index) =>
-                                  this.createPortionPictures(item).then(
-                                      portion =>
-                                          this.index(
-                                              data,
-                                              entry.path.replace(
-                                                  '[]',
-                                                  index.toString()
-                                              ),
-                                              portion
-                                          )
+            images.map(entry =>
+                entry.set
+                    ? Promise.all(
+                          entry.set.map(async (item, index) =>
+                              this.createPortionPictures(item).then(portion =>
+                                  this.index(
+                                      data,
+                                      entry.path.replace(
+                                          '[]',
+                                          index.toString()
+                                      ),
+                                      portion
                                   )
                               )
                           )
-                        : this.createPortionPictures(entry).then(portion =>
-                              this.index(data, entry.path, portion)
-                          )
+                      )
+                    : this.createPortionPictures(entry).then(portion =>
+                          this.index(data, entry.path, portion)
+                      )
             )
         );
     }

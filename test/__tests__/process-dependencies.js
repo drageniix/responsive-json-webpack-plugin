@@ -30,9 +30,9 @@ describe('Dependencies', () => {
             contextDependencies
         );
 
-        expect(fileDependencies).toHaveLength(8);
+        expect(fileDependencies).toHaveLength(9);
         expect(contextDependencies).toHaveLength(7);
-        
+
         expect(
             rjInstance.readFolderDependencies(
                 rjInstance.dirs.sourceTemplates,
@@ -69,6 +69,9 @@ describe('Dependencies', () => {
             direct: {
                 'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/rawtest.json': expect.any(
                     Number
+                ),
+                'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/invalid.json': expect.any(
+                    Number
                 )
             },
             changedFolders: ['index', 'secondary'],
@@ -76,7 +79,7 @@ describe('Dependencies', () => {
                 'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/invalid.json',
                 'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json'
             ],
-            changedDirectFiles: ['rawtest']
+            changedDirectFiles: ['invalid', 'rawtest']
         });
     });
 
@@ -96,6 +99,10 @@ describe('Dependencies', () => {
             'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json': 1539124763943
         };
 
+        rjInstance.establishedDependencies.direct = {
+            'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/invalid.json': 1541718519792
+        };
+
         expect(rjInstance.getChangedDependencies(fileDependencies)).toEqual({
             changedFolders: ['secondary'],
             changedPureFiles: [
@@ -112,6 +119,9 @@ describe('Dependencies', () => {
             },
             direct: {
                 'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/rawtest.json': expect.any(
+                    Number
+                ),
+                'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/raw/invalid.json': expect.any(
                     Number
                 )
             },
@@ -133,9 +143,8 @@ describe('Dependencies', () => {
         });
     });
 
-    
     test('get fileDependencies', () => {
-        const changedDeps = {test: undefined}
+        const changedDeps = { test: undefined };
         rjInstance.readFolderDependencies = jest.fn();
         rjInstance.readFolderDependencies.mockReturnValue({
             fileDependencies,
@@ -155,5 +164,4 @@ describe('Dependencies', () => {
         );
         expect(compilation.fileDependencies.size).toBe(fileDependencies.length);
     });
-
 });

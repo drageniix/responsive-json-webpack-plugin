@@ -55,13 +55,14 @@ declare class ResponsiveJSONWebpackPlugin {
     });
     run(compilation: any): Promise<void>;
     apply(compiler: any): void;
+    readJSON(file: any): Promise<any>;
     saveJSON(folder: string, jsonMap: Array<object>): void;
     savePicture(sourceFilePath: string, { src, size }: {
         src: string;
         size: number;
     }): Promise<void>;
     processDirectFiles(dataFiles: Array<string>): Promise<void[]>;
-    processRawFiles(dataFiles: Array<string>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}][]>;
+    processRawFiles(dataFiles: Array<string>): Promise<(void | [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}])[]>;
     processRawItem(files: any, alternates?: Array<srcAlter>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
     processDataFolders(dataFolders: Array<string>): Promise<void[]>;
     processDataFiles(folder: string): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
