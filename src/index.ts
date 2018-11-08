@@ -129,7 +129,9 @@ class ResponsiveJSONWebpackPlugin {
     }
 
     saveJSON(folder: string, jsonMap: Array<object>) {
-        const stringData = JSON.stringify(Object.assign({}, ...jsonMap));
+        const stringData = JSON.stringify(
+            Object.assign({}, ...jsonMap.filter(json => json))
+        );
         this.assets[
             `./${this.dirs.outputFolder}/${this.dirs.dataPath}/${folder}.json`
         ] = {

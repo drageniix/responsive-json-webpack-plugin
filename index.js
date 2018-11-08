@@ -110,7 +110,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
         return fs_extra_1["default"].readJSON(file);
     };
     ResponsiveJSONWebpackPlugin.prototype.saveJSON = function (folder, jsonMap) {
-        var stringData = JSON.stringify(Object.assign.apply(Object, [{}].concat(jsonMap)));
+        var stringData = JSON.stringify(Object.assign.apply(Object, [{}].concat(jsonMap.filter(function (json) { return json; }))));
         this.assets["./" + this.dirs.outputFolder + "/" + this.dirs.dataPath + "/" + folder + ".json"] = {
             source: function () { return Buffer.from(stringData); },
             size: function () { return stringData.length; }
