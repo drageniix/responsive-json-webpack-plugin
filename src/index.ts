@@ -23,6 +23,9 @@ type srcImg = {
     size: number;
     dest?: string;
 };
+
+type rawSrcImg = srcImg | string;
+
 type srcAlter = {
     dest: string;
     size: number;
@@ -106,6 +109,7 @@ class ResponsiveJSONWebpackPlugin {
             .replace(this.slashRegex, '/');
 
         this.establishedDependencies = this.getDependencies(compilation);
+
         await this.processDataFolders(
             this.establishedDependencies.changedFolders
         );
@@ -124,8 +128,8 @@ class ResponsiveJSONWebpackPlugin {
         );
     }
 
-    readJSON(file) {
-        return fs.readJSON(file);
+    logErrors(path: string, err: string) {
+        console.error(`ResponsiveJSONWebpackPlugin ${err} --"${path}"`);
     }
 
     saveJSON(folder: string, jsonMap: Array<object>) {
@@ -156,9 +160,7 @@ class ResponsiveJSONWebpackPlugin {
                 };
             } catch (err) {
                 this.processedFileNames.pop();
-                console.error(
-                    `ResponsiveJSONWebpackPlugin ${err} --"${sourceFilePath}"`
-                );
+                this.logErrors(sourceFilePath, err);
             }
         }
     }
@@ -166,13 +168,10 @@ class ResponsiveJSONWebpackPlugin {
     processDirectFiles(dataFiles: Array<string>) {
         return Promise.all(
             dataFiles.map(file =>
-                this.readJSON(`${this.dirs.sourceTemplates}/raw/${file}.json`)
+                fs
+                    .readJSON(`${this.dirs.sourceTemplates}/raw/${file}.json`)
                     .then(data => this.saveJSON(file, [data]))
-                    .catch(err => {
-                        console.error(
-                            `ResponsiveJSONWebpackPlugin ${err} --"${file}"`
-                        );
-                    })
+                    .catch(err => this.logErrors(file, err))
             )
         );
     }
@@ -180,72 +179,88 @@ class ResponsiveJSONWebpackPlugin {
     processRawFiles(dataFiles: Array<string>) {
         return Promise.all(
             dataFiles.map(file =>
-                this.readJSON(file)
-                    .then(data => {
-                        const valid = rawValidate(data);
-                        if (valid) {
-                            return Promise.all(
-                                data.map(
-                                    ({
-                                        files,
-                                        alternates
-                                    }: {
-                                        files: Array<srcImg>;
-                                        alternates?: Array<srcAlter>;
-                                    }) => this.processRawItem(files, alternates)
-                                )
-                            );
-                        } else {
-                            console.error(
-                                `ResponsiveJSONWebpackPlugin: ${file}`,
-                                '\n',
-                                rawValidate.errors
-                                    .map(
-                                        err =>
-                                            `path '${err.dataPath}' ${
-                                                err.message
-                                            }`
-                                    )
-                                    .join(', ')
-                            );
-                        }
-                    })
-                    .catch(err => {
-                        console.error(
-                            `ResponsiveJSONWebpackPlugin ${err} --"${file}"`
-                        );
-                    })
+                fs
+                    .readJSON(file)
+                    .then(data => this.validateRawFiles(data))
+                    .then(data =>
+                        Promise.all(
+                            data.map(
+                                ({
+                                    files,
+                                    alternates
+                                }: {
+                                    files: Array<rawSrcImg>;
+                                    alternates?: Array<srcAlter>;
+                                }) =>
+                                    Promise.all(files.map((rawItem: rawSrcImg) =>
+                                        this.processRawItem(rawItem, alternates)
+                                    ))
+                            )
+                        )
+                    )
+                    .catch(err => this.logErrors(file, err))
             )
         );
     }
 
-    processRawItem(files, alternates?: Array<srcAlter>) {
-        return Promise.all(
-            files.map((rawItem: srcImg) => {
-                const source = this.parseRawSource(rawItem);
-                return alternates
-                    ? Promise.all(
-                          alternates.map(alter =>
-                              this.savePicture(
-                                  `${this.dirs.sourceImages}/${rawItem.src}`,
-                                  {
-                                      src: this.generateFileName(
-                                          source,
-                                          alter.dest
-                                      ),
-                                      size: alter.size
-                                  }
-                              )
-                          )
-                      )
-                    : this.savePicture(
+    validateRawFiles(data: Array<object>) {
+        if (rawValidate(data)) {
+            return data;
+        } else {
+            throw new Error(
+                rawValidate.errors
+                    .map(err => `path '${err.dataPath}' ${err.message}`)
+                    .join(', ')
+            );
+        }
+    }
+
+    async processRawItem(rawItem: rawSrcImg, alternates?: Array<srcAlter>) {
+        if (typeof rawItem === 'object') {
+            return await this.processRawItemObject(rawItem, alternates);
+        } else if (alternates) {
+            return await this.processRawItemString(rawItem, alternates);
+        } else {
+            this.logErrors(
+                '',
+                'Alternates must be used in string path only file sources.'
+            );
+        }
+    }
+
+    processRawItemObject(rawItem: srcImg, alternates?: Array<srcAlter>) {
+        const source = this.parseRawSource(rawItem);
+        return alternates
+            ? Promise.all(
+                  alternates.map(alter =>
+                      this.savePicture(
                           `${this.dirs.sourceImages}/${rawItem.src}`,
                           {
-                              src: this.generateFileName(source, rawItem.dest),
-                              size: rawItem.size
+                              src: this.generateFileName(source, alter.dest),
+                              size: alter.size
                           }
-                      );
-            })
+                      )
+                  )
+              )
+            : this.savePicture(`${this.dirs.sourceImages}/${rawItem.src}`, {
+                  src: this.generateFileName(source, rawItem.dest),
+                  size: rawItem.size
+              });
+    }
+
+    processRawItemString(rawItem: string, alternates: Array<srcAlter>) {
+        const source = {
+            name: rawItem.slice(0, rawItem.lastIndexOf('.')),
+            extension: rawItem.slice(rawItem.lastIndexOf('.'))
+        };
+
+        return Promise.all(
+            alternates.map(alter =>
+                this.savePicture(`${this.dirs.sourceImages}/${rawItem}`, {
+                    src: this.generateFileName(source, alter.dest),
+                    size: alter.size
+                })
+            )
         );
     }
 
@@ -266,7 +281,8 @@ class ResponsiveJSONWebpackPlugin {
 
         return Promise.all(
             dataFiles.map(file =>
-                this.readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
+                fs
+                    .readJSON(`${this.dirs.sourceTemplates}/${folder}/${file}`)
                     .then(data => this.checkImageFile(folder, file, data))
                     .then(data => {
                         const fileKey = file.replace(
@@ -278,11 +294,7 @@ class ResponsiveJSONWebpackPlugin {
                             : fileKey.substring(0, fileKey.lastIndexOf('.'));
                         return { [jsonKey]: data };
                     })
-                    .catch(err => {
-                        console.error(
-                            `ResponsiveJSONWebpackPlugin ${err} --"${file}"`
-                        );
-                    })
+                    .catch(err => this.logErrors(file, err))
             )
         );
     }
@@ -295,22 +307,20 @@ class ResponsiveJSONWebpackPlugin {
             )
         ) {
             try {
-                const images = await this.readJSON(
+                const images = await fs.readJSON(
                     `${this.dirs.sourceTemplates}/${folder}/${imageFile}`
                 );
                 if (responsiveValidate(images)) {
                     await this.injectImagesIntoDataFile(images, data);
                 } else {
-                    console.error(
-                        `ResponsiveJSONWebpackPlugin: ${file}`,
-                        '\n',
+                    throw new Error(
                         responsiveValidate.errors
                             .map(err => `path '${err.dataPath}' ${err.message}`)
                             .join(', ')
                     );
                 }
             } catch (err) {
-                console.error(`ResponsiveJSONWebpackPlugin ${err} --"${file}"`);
+                this.logErrors(file, err);
             }
         }
         return data;
@@ -615,7 +625,10 @@ class ResponsiveJSONWebpackPlugin {
             );
 
             const time = fs.statSync(rawFileName).mtime.getTime();
-            if (folderFile === this.dirs.rawFolder) {
+            if (
+                folderFile === this.dirs.rawFolder &&
+                this.getFirstSlash(folderFile) < 0 //no nested folders
+            ) {
                 if (this.establishedDependencies.direct[rawFileName] !== time) {
                     changedDirectFiles.push(fileName);
                 }
@@ -623,7 +636,7 @@ class ResponsiveJSONWebpackPlugin {
             } else if (
                 (group === this.dirs.dataPath ||
                     group === this.dirs.imagePath) &&
-                this.getFirstSlash(folderFile) > 0
+                this.getFirstSlash(folderFile) > 0 //no images/data folder by itself
             ) {
                 folders[folder] = folders[folder]
                     ? folders[folder]

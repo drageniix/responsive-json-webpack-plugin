@@ -23,12 +23,10 @@ test('direct', () =>
     }));
 
 test('invalid', () => {
-    console.error = jest.fn();
+    rjInstance.logErrors = jest.fn();
 
     return rjInstance.processDirectFiles(['invalid']).then(() => {
-        expect(console.error).toHaveBeenCalled();
-        console.error.mockRestore();
-
+        expect(rjInstance.logErrors).toHaveBeenCalled();
         expect(rjInstance.saveJSON).toHaveBeenCalledTimes(1);
     });
 });

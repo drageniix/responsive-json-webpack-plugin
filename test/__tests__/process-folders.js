@@ -26,7 +26,7 @@ rjInstance.establishedDependencies.folders = {
 describe('integrated files', () => {
     test('process files', () => {
         rjInstance.injectImagesIntoDataFile = jest.fn();
-        console.error = jest.fn();
+        rjInstance.logErrors = jest.fn();
 
         return rjInstance.processDataFiles('index').then(result => {
             expect(result[1]['sample']).toBeTruthy();
@@ -34,8 +34,7 @@ describe('integrated files', () => {
             expect(rjInstance.injectImagesIntoDataFile).toHaveBeenCalledTimes(
                 1
             );
-            expect(console.error).toHaveBeenCalled();
-            console.error.mockRestore();
+            expect(rjInstance.logErrors).toHaveBeenCalled();
         });
     });
 

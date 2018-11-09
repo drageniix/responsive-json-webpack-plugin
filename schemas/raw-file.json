@@ -6,38 +6,43 @@
     "items": {
         "type": "object",
         "title": "Set of Resize Instructions",
-        "required": [
-            "files"
-        ],
+        "required": ["files"],
         "properties": {
             "files": {
                 "type": "array",
                 "title": "Files to Process",
                 "items": {
-                    "type": "object",
-                    "title": "File",
-                    "required": [
-                        "src"
-                    ],
-                    "properties": {
-                        "src": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "title": "File",
+                            "required": ["src"],
+                            "properties": {
+                                "src": {
+                                    "type": "string",
+                                    "title": "Filepath",
+                                    "default": "",
+                                    "pattern": "^(.*)$"
+                                },
+                                "dest": {
+                                    "type": "string",
+                                    "title": "Output Filename",
+                                    "default": "",
+                                    "pattern": "^(.*)$"
+                                },
+                                "size": {
+                                    "type": "integer",
+                                    "title": "Desired Width of Image",
+                                    "default": 0
+                                }
+                            }
+                        },
+                        {
                             "type": "string",
                             "title": "Filepath",
-                            "default": "",
                             "pattern": "^(.*)$"
-                        },
-                        "dest": {
-                            "type": "string",
-                            "title": "Output Filename",
-                            "default": "",
-                            "pattern": "^(.*)$"
-                        },
-                        "size": {
-                            "type": "integer",
-                            "title": "Desired Width of Image",
-                            "default": 0
                         }
-                    }
+                    ]
                 }
             },
             "alternates": {
@@ -46,10 +51,7 @@
                 "items": {
                     "type": "object",
                     "title": "File",
-                    "required": [
-                        "dest",
-                        "size"
-                    ],
+                    "required": ["dest", "size"],
                     "properties": {
                         "src": {
                             "type": "string",

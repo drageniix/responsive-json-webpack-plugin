@@ -3,7 +3,7 @@
         "files": [
             {
                 "src": "sample-1.png",
-                "size" : 16
+                "size": 16
             }
         ]
     },
@@ -11,8 +11,7 @@
         "files": [
             {
                 "src": "sample-2.png",
-                "dest" : "herrso",
-                "size": 16
+                "dest": "herrso"
             }
         ],
         "alternates": [
@@ -27,14 +26,7 @@
         ]
     },
     {
-        "files": [
-            {
-                "src": "sample-2.png"
-            },
-            {
-                "src": "sample-3.png"
-            }
-        ],
+        "files": ["sample-2.png", "sample-3.png"],
         "alternates": [
             {
                 "size": 8,

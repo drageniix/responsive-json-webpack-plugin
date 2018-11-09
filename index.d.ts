@@ -3,6 +3,7 @@ declare type srcImg = {
     size: number;
     dest?: string;
 };
+declare type rawSrcImg = srcImg | string;
 declare type srcAlter = {
     dest: string;
     size: number;
@@ -55,15 +56,18 @@ declare class ResponsiveJSONWebpackPlugin {
     });
     run(compilation: any): Promise<void>;
     apply(compiler: any): void;
-    readJSON(file: any): Promise<any>;
+    logErrors(path: string, err: string): void;
     saveJSON(folder: string, jsonMap: Array<object>): void;
     savePicture(sourceFilePath: string, { src, size }: {
         src: string;
         size: number;
     }): Promise<void>;
     processDirectFiles(dataFiles: Array<string>): Promise<void[]>;
-    processRawFiles(dataFiles: Array<string>): Promise<(void | [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}])[]>;
-    processRawItem(files: any, alternates?: Array<srcAlter>): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
+    processRawFiles(dataFiles: Array<string>): Promise<(void | (void | void[])[][])[]>;
+    validateRawFiles(data: Array<object>): object[];
+    processRawItem(rawItem: rawSrcImg, alternates?: Array<srcAlter>): Promise<void | void[]>;
+    processRawItemObject(rawItem: srcImg, alternates?: Array<srcAlter>): Promise<void> | Promise<void[]>;
+    processRawItemString(rawItem: string, alternates: Array<srcAlter>): Promise<void[]>;
     processDataFolders(dataFolders: Array<string>): Promise<void[]>;
     processDataFiles(folder: string): Promise<[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]>;
     checkImageFile(folder: any, file: any, data: any): Promise<any>;

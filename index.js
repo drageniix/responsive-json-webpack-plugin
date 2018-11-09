@@ -106,8 +106,8 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     ResponsiveJSONWebpackPlugin.prototype.apply = function (compiler) {
         compiler.hooks.emit.tapPromise('ResponsiveJSONWebpackPlugin', this.run.bind(this));
     };
-    ResponsiveJSONWebpackPlugin.prototype.readJSON = function (file) {
-        return fs_extra_1["default"].readJSON(file);
+    ResponsiveJSONWebpackPlugin.prototype.logErrors = function (path, err) {
+        console.error("ResponsiveJSONWebpackPlugin " + err + " --\"" + path + "\"");
     };
     ResponsiveJSONWebpackPlugin.prototype.saveJSON = function (folder, jsonMap) {
         var stringData = JSON.stringify(Object.assign.apply(Object, [{}].concat(jsonMap.filter(function (json) { return json; }))));
@@ -141,7 +141,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                     case 3:
                         err_1 = _c.sent();
                         this.processedFileNames.pop();
-                        console.error("ResponsiveJSONWebpackPlugin " + err_1 + " --\"" + sourceFilePath + "\"");
+                        this.logErrors(sourceFilePath, err_1);
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
@@ -151,51 +151,83 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     ResponsiveJSONWebpackPlugin.prototype.processDirectFiles = function (dataFiles) {
         var _this = this;
         return Promise.all(dataFiles.map(function (file) {
-            return _this.readJSON(_this.dirs.sourceTemplates + "/raw/" + file + ".json")
-                .then(function (data) { return _this.saveJSON(file, [data]); })["catch"](function (err) {
-                console.error("ResponsiveJSONWebpackPlugin " + err + " --\"" + file + "\"");
-            });
+            return fs_extra_1["default"]
+                .readJSON(_this.dirs.sourceTemplates + "/raw/" + file + ".json")
+                .then(function (data) { return _this.saveJSON(file, [data]); })["catch"](function (err) { return _this.logErrors(file, err); });
         }));
     };
     ResponsiveJSONWebpackPlugin.prototype.processRawFiles = function (dataFiles) {
         var _this = this;
         return Promise.all(dataFiles.map(function (file) {
-            return _this.readJSON(file)
+            return fs_extra_1["default"]
+                .readJSON(file)
+                .then(function (data) { return _this.validateRawFiles(data); })
                 .then(function (data) {
-                var valid = rawValidate(data);
-                if (valid) {
-                    return Promise.all(data.map(function (_a) {
-                        var files = _a.files, alternates = _a.alternates;
-                        return _this.processRawItem(files, alternates);
+                return Promise.all(data.map(function (_a) {
+                    var files = _a.files, alternates = _a.alternates;
+                    return Promise.all(files.map(function (rawItem) {
+                        return _this.processRawItem(rawItem, alternates);
                     }));
-                }
-                else {
-                    console.error("ResponsiveJSONWebpackPlugin: " + file, '\n', rawValidate.errors
-                        .map(function (err) {
-                        return "path '" + err.dataPath + "' " + err.message;
-                    })
-                        .join(', '));
-                }
-            })["catch"](function (err) {
-                console.error("ResponsiveJSONWebpackPlugin " + err + " --\"" + file + "\"");
-            });
+                }));
+            })["catch"](function (err) { return _this.logErrors(file, err); });
         }));
     };
-    ResponsiveJSONWebpackPlugin.prototype.processRawItem = function (files, alternates) {
+    ResponsiveJSONWebpackPlugin.prototype.validateRawFiles = function (data) {
+        if (rawValidate(data)) {
+            return data;
+        }
+        else {
+            throw new Error(rawValidate.errors
+                .map(function (err) { return "path '" + err.dataPath + "' " + err.message; })
+                .join(', '));
+        }
+    };
+    ResponsiveJSONWebpackPlugin.prototype.processRawItem = function (rawItem, alternates) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(typeof rawItem === 'object')) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.processRawItemObject(rawItem, alternates)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                    case 2:
+                        if (!alternates) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.processRawItemString(rawItem, alternates)];
+                    case 3: return [2 /*return*/, _a.sent()];
+                    case 4:
+                        this.logErrors('', 'Alternates must be used in string path only file sources.');
+                        _a.label = 5;
+                    case 5: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ResponsiveJSONWebpackPlugin.prototype.processRawItemObject = function (rawItem, alternates) {
         var _this = this;
-        return Promise.all(files.map(function (rawItem) {
-            var source = _this.parseRawSource(rawItem);
-            return alternates
-                ? Promise.all(alternates.map(function (alter) {
-                    return _this.savePicture(_this.dirs.sourceImages + "/" + rawItem.src, {
-                        src: _this.generateFileName(source, alter.dest),
-                        size: alter.size
-                    });
-                }))
-                : _this.savePicture(_this.dirs.sourceImages + "/" + rawItem.src, {
-                    src: _this.generateFileName(source, rawItem.dest),
-                    size: rawItem.size
+        var source = this.parseRawSource(rawItem);
+        return alternates
+            ? Promise.all(alternates.map(function (alter) {
+                return _this.savePicture(_this.dirs.sourceImages + "/" + rawItem.src, {
+                    src: _this.generateFileName(source, alter.dest),
+                    size: alter.size
                 });
+            }))
+            : this.savePicture(this.dirs.sourceImages + "/" + rawItem.src, {
+                src: this.generateFileName(source, rawItem.dest),
+                size: rawItem.size
+            });
+    };
+    ResponsiveJSONWebpackPlugin.prototype.processRawItemString = function (rawItem, alternates) {
+        var _this = this;
+        var source = {
+            name: rawItem.slice(0, rawItem.lastIndexOf('.')),
+            extension: rawItem.slice(rawItem.lastIndexOf('.'))
+        };
+        return Promise.all(alternates.map(function (alter) {
+            return _this.savePicture(_this.dirs.sourceImages + "/" + rawItem, {
+                src: _this.generateFileName(source, alter.dest),
+                size: alter.size
+            });
         }));
     };
     ResponsiveJSONWebpackPlugin.prototype.processDataFolders = function (dataFolders) {
@@ -210,7 +242,8 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
         var _this = this;
         var dataFiles = this.establishedDependencies.folders[folder].filenames.filter(function (name) { return name.startsWith(_this.dirs.dataPath); });
         return Promise.all(dataFiles.map(function (file) {
-            return _this.readJSON(_this.dirs.sourceTemplates + "/" + folder + "/" + file)
+            return fs_extra_1["default"]
+                .readJSON(_this.dirs.sourceTemplates + "/" + folder + "/" + file)
                 .then(function (data) { return _this.checkImageFile(folder, file, data); })
                 .then(function (data) {
                 var _a;
@@ -219,9 +252,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                     ? fileKey.substring(1, fileKey.lastIndexOf('.'))
                     : fileKey.substring(0, fileKey.lastIndexOf('.'));
                 return _a = {}, _a[jsonKey] = data, _a;
-            })["catch"](function (err) {
-                console.error("ResponsiveJSONWebpackPlugin " + err + " --\"" + file + "\"");
-            });
+            })["catch"](function (err) { return _this.logErrors(file, err); });
         }));
     };
     ResponsiveJSONWebpackPlugin.prototype.checkImageFile = function (folder, file, data) {
@@ -235,7 +266,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 6, , 7]);
-                        return [4 /*yield*/, this.readJSON(this.dirs.sourceTemplates + "/" + folder + "/" + imageFile)];
+                        return [4 /*yield*/, fs_extra_1["default"].readJSON(this.dirs.sourceTemplates + "/" + folder + "/" + imageFile)];
                     case 2:
                         images = _a.sent();
                         if (!responsiveValidate(images)) return [3 /*break*/, 4];
@@ -243,15 +274,13 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
                     case 3:
                         _a.sent();
                         return [3 /*break*/, 5];
-                    case 4:
-                        console.error("ResponsiveJSONWebpackPlugin: " + file, '\n', responsiveValidate.errors
-                            .map(function (err) { return "path '" + err.dataPath + "' " + err.message; })
-                            .join(', '));
-                        _a.label = 5;
+                    case 4: throw new Error(responsiveValidate.errors
+                        .map(function (err) { return "path '" + err.dataPath + "' " + err.message; })
+                        .join(', '));
                     case 5: return [3 /*break*/, 7];
                     case 6:
                         err_2 = _a.sent();
-                        console.error("ResponsiveJSONWebpackPlugin " + err_2 + " --\"" + file + "\"");
+                        this.logErrors(file, err_2);
                         return [3 /*break*/, 7];
                     case 7: return [2 /*return*/, data];
                 }
@@ -500,7 +529,9 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             var group = folderFile.slice(_this.getFirstSlash(folderFile) + 1);
             var fileName = rawFileName.slice(_this.getLastSlash(rawFileName) + 1, rawFileName.lastIndexOf('.'));
             var time = fs_extra_1["default"].statSync(rawFileName).mtime.getTime();
-            if (folderFile === _this.dirs.rawFolder) {
+            if (folderFile === _this.dirs.rawFolder &&
+                _this.getFirstSlash(folderFile) < 0 //no nested folders
+            ) {
                 if (_this.establishedDependencies.direct[rawFileName] !== time) {
                     changedDirectFiles.push(fileName);
                 }
@@ -508,7 +539,8 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
             }
             else if ((group === _this.dirs.dataPath ||
                 group === _this.dirs.imagePath) &&
-                _this.getFirstSlash(folderFile) > 0) {
+                _this.getFirstSlash(folderFile) > 0 //no images/data folder by itself
+            ) {
                 folders[folder] = folders[folder]
                     ? folders[folder]
                     : {

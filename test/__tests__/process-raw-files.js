@@ -13,16 +13,13 @@ rjInstance.generateFileName = jest.fn();
 rjInstance.generateFileName.mockReturnValue('out.jpg');
 
 describe('raw files', () => {
-    test('single with no alternates', () => {
+    test('object with no alternates', () => {
         return rjInstance
-            .processRawItem([
-                {
-                    src: 'sample-1.png',
-                    size: 16
-                }
-            ])
-            .then(result => {
-                expect(result).toHaveLength(1);
+            .processRawItem({
+                src: 'sample-1.png',
+                size: 16
+            })
+            .then(() => {
                 expect(rjInstance.savePicture.mock.calls).toHaveLength(1);
                 expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
                     '../examples/images/sample-1.png',
@@ -31,17 +28,12 @@ describe('raw files', () => {
             });
     });
 
-    test('multiple with alternates', () => {
+    test('object with alternates', () => {
         return rjInstance
             .processRawItem(
-                [
-                    {
-                        src: 'sample-2.png'
-                    },
-                    {
-                        src: 'sample-3.png'
-                    }
-                ],
+                {
+                    src: 'sample-2.png'
+                },
                 [
                     {
                         size: 36,
@@ -53,12 +45,28 @@ describe('raw files', () => {
                     }
                 ]
             )
-            .then(result => {
-                expect(result[0]).toHaveLength(2);
-                expect(rjInstance.savePicture).toHaveBeenCalledTimes(5);
+            .then(() => {
+                expect(rjInstance.savePicture).toHaveBeenCalledTimes(3);
                 expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
-                    '../examples/images/sample-3.png',
+                    '../examples/images/sample-2.png',
                     { size: 8, src: 'out.jpg' }
+                );
+            });
+    });
+
+    test('string with alternates', () => {
+        return rjInstance
+            .processRawItem('sample-2.png', [
+                {
+                    size: 36,
+                    dest: '[name]-huge'
+                }
+            ])
+            .then(() => {
+                expect(rjInstance.savePicture).toHaveBeenCalledTimes(4);
+                expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
+                    '../examples/images/sample-2.png',
+                    { size: 36, src: 'out.jpg' }
                 );
             });
     });
@@ -72,20 +80,19 @@ describe('raw files', () => {
             .then(result => {
                 expect(result).toHaveLength(1);
                 expect(result[0]).toHaveLength(3);
-                expect(rjInstance.processRawItem).toHaveBeenCalledTimes(3);
+                expect(rjInstance.processRawItem).toHaveBeenCalledTimes(4);
             });
     });
 
     test('reject invalid JSON', () => {
         rjInstance.processRawItem = jest.fn();
-        console.error = jest.fn();
+        rjInstance.logErrors = jest.fn();
         return rjInstance
             .processRawFiles([
                 'D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\examples\\templates\\invalid.json'
             ])
             .then(() => {
-                expect(console.error).toHaveBeenCalled();
-                console.error.mockRestore();
+                expect(rjInstance.logErrors).toHaveBeenCalled();
             });
     });
 });

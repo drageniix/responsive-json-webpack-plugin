@@ -84,7 +84,7 @@ describe('save to assets', () => {
         const src = 'sample-1.png';
         const size = 16;
         const sourceFileName = 'invalidpath';
-        console.error = jest.fn();
+        rjInstance.logErrors = jest.fn();
 
         rjInstance.processedFileNames = [];
         rjInstance.assets = {};
@@ -92,8 +92,7 @@ describe('save to assets', () => {
         return rjInstance
             .savePicture(sourceFileName, { src, size })
             .then(() => {
-                expect(console.error).toHaveBeenCalled();
-                console.error.mockRestore();
+                expect(rjInstance.logErrors).toHaveBeenCalled();
                 expect(rjInstance.processedFileNames).toHaveLength(0);
                 expect(Object.keys(rjInstance.assets)).toHaveLength(0);
             });
