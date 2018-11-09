@@ -192,9 +192,14 @@ class ResponsiveJSONWebpackPlugin {
                                     files: Array<rawSrcImg>;
                                     alternates?: Array<srcAlter>;
                                 }) =>
-                                    Promise.all(files.map((rawItem: rawSrcImg) =>
-                                        this.processRawItem(rawItem, alternates)
-                                    ))
+                                    Promise.all(
+                                        files.map((rawItem: rawSrcImg) =>
+                                            this.processRawItem(
+                                                rawItem,
+                                                alternates
+                                            )
+                                        )
+                                    )
                             )
                         )
                     )
@@ -228,24 +233,28 @@ class ResponsiveJSONWebpackPlugin {
         }
     }
 
-    processRawItemObject(rawItem: srcImg, alternates?: Array<srcAlter>) {
+    async processRawItemObject(rawItem: srcImg, alternates?: Array<srcAlter>) {
         const source = this.parseRawSource(rawItem);
-        return alternates
-            ? Promise.all(
-                  alternates.map(alter =>
-                      this.savePicture(
-                          `${this.dirs.sourceImages}/${rawItem.src}`,
-                          {
-                              src: this.generateFileName(source, alter.dest),
-                              size: alter.size
-                          }
-                      )
-                  )
-              )
-            : this.savePicture(`${this.dirs.sourceImages}/${rawItem.src}`, {
-                  src: this.generateFileName(source, rawItem.dest),
-                  size: rawItem.size
-              });
+        if (source.size) {
+            await this.savePicture(`${this.dirs.sourceImages}/${rawItem.src}`, {
+                src: this.generateFileName(source, rawItem.dest),
+                size: rawItem.size
+            });
+        }
+
+        if (alternates) {
+            await Promise.all(
+                alternates.map(alter =>
+                    this.savePicture(
+                        `${this.dirs.sourceImages}/${rawItem.src}`,
+                        {
+                            src: this.generateFileName(source, alter.dest),
+                            size: alter.size
+                        }
+                    )
+                )
+            );
+        }
     }
 
     processRawItemString(rawItem: string, alternates: Array<srcAlter>) {

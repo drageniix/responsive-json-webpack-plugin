@@ -28,7 +28,7 @@ describe('raw files', () => {
             });
     });
 
-    test('object with alternates', () => {
+    test('object with no size and alternates', () => {
         return rjInstance
             .processRawItem(
                 {
@@ -54,6 +54,29 @@ describe('raw files', () => {
             });
     });
 
+    test('object with alternates', () => {
+        return rjInstance
+            .processRawItem(
+                {
+                    src: 'sample-2.png',
+                    size: 16
+                },
+                [
+                    {
+                        size: 36,
+                        dest: '[name]-huge'
+                    }
+                ]
+            )
+            .then(() => {
+                expect(rjInstance.savePicture).toHaveBeenCalledTimes(5);
+                expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
+                    '../examples/images/sample-2.png',
+                    { size: 36, src: 'out.jpg' }
+                );
+            });
+    });
+
     test('string with alternates', () => {
         return rjInstance
             .processRawItem('sample-2.png', [
@@ -63,7 +86,7 @@ describe('raw files', () => {
                 }
             ])
             .then(() => {
-                expect(rjInstance.savePicture).toHaveBeenCalledTimes(4);
+                expect(rjInstance.savePicture).toHaveBeenCalledTimes(6);
                 expect(rjInstance.savePicture).toHaveBeenLastCalledWith(
                     '../examples/images/sample-2.png',
                     { size: 36, src: 'out.jpg' }

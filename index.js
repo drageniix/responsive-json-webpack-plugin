@@ -203,19 +203,36 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
         });
     };
     ResponsiveJSONWebpackPlugin.prototype.processRawItemObject = function (rawItem, alternates) {
-        var _this = this;
-        var source = this.parseRawSource(rawItem);
-        return alternates
-            ? Promise.all(alternates.map(function (alter) {
-                return _this.savePicture(_this.dirs.sourceImages + "/" + rawItem.src, {
-                    src: _this.generateFileName(source, alter.dest),
-                    size: alter.size
-                });
-            }))
-            : this.savePicture(this.dirs.sourceImages + "/" + rawItem.src, {
-                src: this.generateFileName(source, rawItem.dest),
-                size: rawItem.size
+        return __awaiter(this, void 0, void 0, function () {
+            var source;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        source = this.parseRawSource(rawItem);
+                        if (!source.size) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.savePicture(this.dirs.sourceImages + "/" + rawItem.src, {
+                                src: this.generateFileName(source, rawItem.dest),
+                                size: rawItem.size
+                            })];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        if (!alternates) return [3 /*break*/, 4];
+                        return [4 /*yield*/, Promise.all(alternates.map(function (alter) {
+                                return _this.savePicture(_this.dirs.sourceImages + "/" + rawItem.src, {
+                                    src: _this.generateFileName(source, alter.dest),
+                                    size: alter.size
+                                });
+                            }))];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
+                }
             });
+        });
     };
     ResponsiveJSONWebpackPlugin.prototype.processRawItemString = function (rawItem, alternates) {
         var _this = this;

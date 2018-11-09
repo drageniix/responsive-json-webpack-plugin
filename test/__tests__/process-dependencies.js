@@ -96,7 +96,7 @@ describe('Dependencies', () => {
             }
         };
         rjInstance.establishedDependencies.files = {
-            'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json': 1541771840728
+            'D:/Dropbox/Programming/Web Development/_Packages/ResponsiveJSONWebpackPlugin/test/examples/templates/pure.json': 1541788230301
         };
 
         rjInstance.establishedDependencies.direct = {

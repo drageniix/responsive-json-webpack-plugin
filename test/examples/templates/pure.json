@@ -11,6 +11,7 @@
         "files": [
             {
                 "src": "sample-2.png",
+                "size": 16,
                 "dest": "herrso"
             }
         ],
