@@ -9,7 +9,10 @@ const ajv = new Ajv();
 
 const rawValidate = ajv.compile(rawSchema);
 const responsiveValidate = ajv.compile(responsiveSchema);
-
+type originalOptions = {
+    sourceTemplates: string;
+    sourceImages: string;
+};
 type directoryOptions = {
     dataPath: string;
     imagePath: string;
@@ -25,6 +28,10 @@ type srcImg = {
 };
 
 type rawSrcImg = srcImg | string;
+type rawSrcEntry = {
+    files: Array<rawSrcImg>;
+    alternates?: Array<srcAlter>;
+};
 
 type srcAlter = {
     dest: string;
@@ -66,7 +73,7 @@ type sourceBase = {
 };
 
 class ResponsiveJSONWebpackPlugin {
-    private options: directoryOptions;
+    private options: originalOptions;
     private dirs: directoryOptions;
     private slashRegex: RegExp = new RegExp(/\\/, 'g');
     private processedFileNames: Array<string>;
@@ -86,13 +93,18 @@ class ResponsiveJSONWebpackPlugin {
         sourceImages = 'src/assets/images',
         outputFolder = 'assets'
     } = {}) {
-        this.dirs = this.options = {
+        this.dirs = {
             dataPath,
             imagePath,
             rawFolder,
             sourceTemplates,
             sourceImages,
             outputFolder
+        };
+
+        this.options = {
+            sourceTemplates,
+            sourceImages
         };
     }
 
@@ -136,12 +148,16 @@ class ResponsiveJSONWebpackPlugin {
         const stringData = JSON.stringify(
             Object.assign({}, ...jsonMap.filter(json => json))
         );
-        this.assets[
-            `./${this.dirs.outputFolder}/${this.dirs.dataPath}/${folder}.json`
-        ] = {
-            source: () => Buffer.from(stringData),
-            size: () => stringData.length
-        };
+        if (stringData.length > 0) {
+            this.assets[
+                `./${this.dirs.outputFolder}/${
+                    this.dirs.dataPath
+                }/${folder}.json`
+            ] = {
+                source: () => Buffer.from(stringData),
+                size: () => stringData.length
+            };
+        }
     }
 
     async savePicture(
@@ -169,7 +185,11 @@ class ResponsiveJSONWebpackPlugin {
         return Promise.all(
             dataFiles.map(file =>
                 fs
-                    .readJSON(`${this.dirs.sourceTemplates}/raw/${file}.json`)
+                    .readJSON(
+                        `${this.dirs.sourceTemplates}/${
+                            this.dirs.rawFolder
+                        }/${file}.json`
+                    )
                     .then(data => this.saveJSON(file, [data]))
                     .catch(err => this.logErrors(file, err))
             )
@@ -184,22 +204,16 @@ class ResponsiveJSONWebpackPlugin {
                     .then(data => this.validateRawFiles(data))
                     .then(data =>
                         Promise.all(
-                            data.map(
-                                ({
-                                    files,
-                                    alternates
-                                }: {
-                                    files: Array<rawSrcImg>;
-                                    alternates?: Array<srcAlter>;
-                                }) =>
-                                    Promise.all(
-                                        files.map((rawItem: rawSrcImg) =>
-                                            this.processRawItem(
-                                                rawItem,
-                                                alternates
-                                            )
+                            data.map((raw: rawSrcEntry) =>
+                                Promise.all(
+                                    raw.files.map((rawItem: rawSrcImg) =>
+                                        this.processRawItem(
+                                            file,
+                                            rawItem,
+                                            raw.alternates
                                         )
                                     )
+                                )
                             )
                         )
                     )
@@ -220,14 +234,18 @@ class ResponsiveJSONWebpackPlugin {
         }
     }
 
-    async processRawItem(rawItem: rawSrcImg, alternates?: Array<srcAlter>) {
+    async processRawItem(
+        file: string,
+        rawItem: rawSrcImg,
+        alternates?: Array<srcAlter>
+    ) {
         if (typeof rawItem === 'object') {
-            return await this.processRawItemObject(rawItem, alternates);
+            return this.processRawItemObject(rawItem, alternates);
         } else if (alternates) {
-            return await this.processRawItemString(rawItem, alternates);
+            return this.processRawItemString(rawItem, alternates);
         } else {
             this.logErrors(
-                '',
+                file,
                 'Alternates must be used in string path only file sources.'
             );
         }
@@ -340,7 +358,7 @@ class ResponsiveJSONWebpackPlugin {
             images.map(entry =>
                 entry.set
                     ? Promise.all(
-                          entry.set.map(async (item, index) =>
+                          entry.set.map((item, index) =>
                               this.createPortionPictures(item).then(portion =>
                                   this.index(
                                       data,
@@ -580,6 +598,7 @@ class ResponsiveJSONWebpackPlugin {
         };
     }
 
+    //recursive
     readFolderDependencies(
         dir: string,
         context: string,
@@ -669,7 +688,7 @@ class ResponsiveJSONWebpackPlugin {
         for (let folder in folders) {
             folders[folder].lastUpdate = folders[folder].lastUpdate
                 .sort()
-                .reverse()[0];
+                .reverse()[0]; //most recent update across all files in folder
             if (
                 !this.establishedDependencies.folders[folder] ||
                 this.establishedDependencies.folders[folder].lastUpdate <

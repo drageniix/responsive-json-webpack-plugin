@@ -15,7 +15,7 @@ rjInstance.generateFileName.mockReturnValue('out.jpg');
 describe('raw files', () => {
     test('object with no alternates', () => {
         return rjInstance
-            .processRawItem({
+            .processRawItem('filename', {
                 src: 'sample-1.png',
                 size: 16
             })
@@ -31,6 +31,7 @@ describe('raw files', () => {
     test('object with no size and alternates', () => {
         return rjInstance
             .processRawItem(
+                'filename',
                 {
                     src: 'sample-2.png'
                 },
@@ -57,6 +58,7 @@ describe('raw files', () => {
     test('object with alternates', () => {
         return rjInstance
             .processRawItem(
+                'filename',
                 {
                     src: 'sample-2.png',
                     size: 16
@@ -79,7 +81,7 @@ describe('raw files', () => {
 
     test('string with alternates', () => {
         return rjInstance
-            .processRawItem('sample-2.png', [
+            .processRawItem('filename', 'sample-2.png', [
                 {
                     size: 36,
                     dest: '[name]-huge'

@@ -6,65 +6,35 @@ Set resizing instructions in JSON, can also output combined JSON with responsive
 
 ## Install
 
+<!-- prettier-ignore -->
 ```
 npm install responsive-json-webpack-plugin
-
-
-
 ```
+
+Note for Windows users: You may need to run `npm install --global --production windows-build-tools` as an Adminstrator first to properly install node-gyp, a dependency of sharp. This will also install Python 2.7.
 
 #### webpack.config.js (Webpack 4)
 
+<!-- prettier-ignore -->
 ```javascript
 const ResponsiveJSONWebpackPlugin = require("responsive-json-webpack-plugin")
 
-
-
-
-
-
-
-{
-
-
-
+module.exports = {
     plugins: [
-
-
-
         new ResponsiveJSONWebpackPlugin({
-
-
-
             sourceTemplates = "src/assets/templates" //default
-
-
-
             sourceImages = "src/assets/images", //default
-
-
-
             outputFolder = "assets" //default
-
-
-
         })
 
-
-
     ]
-
-
-
 }
-
-
 
 ```
 
 # As JSON copier
 
-If you just want to directly copy a json file to your build folder without having to require it in your javascript via a separate loader, put it in a folder called "raw" in your templates. It will be minimized and put in the outputFolder/data with the same name.
+If you just want to directly copy a json file to your build folder without having to/ require it in your javascript via a separate loader, put it in a folder called "raw" in your templates. It will be minimized and put in the outputFolder/data with the same name.
 
 # Basic Image Resize Usage
 
@@ -89,7 +59,7 @@ src/assets/templates/images.json
 ]
 ```
 
-The following will create a 36px width "helloworld-huge.png" and an 8px width "helloworld-8.png" in "assets/images" in the output build folder. Note that `[name]` and `[size]` will be replaced appropriately.
+The following will create a 16px helloworld.png, a 36px width "helloworld-huge.png", and an 8px width "helloworld-8.png" in "assets/images" in the output build folder. Note that `[name]` and `[size]` will be replaced appropriately.
 
 ```json
 [
@@ -115,9 +85,25 @@ The following will create a 36px width "helloworld-huge.png" and an 8px width "h
 ]
 ```
 
-# JSON Injection Usage
+You can skip copying the original file by omitting the `size` property of the source file, or by entering the source file path as a string instead of in an object. The following will just create a 36px sample-2-huge.png.
 
-JSON injection uses the same webpack options, but requires a folder structure where the first subdirectory in the template folder is the output json file name. It must contain the folders "data" and "images", with matching filenames for those which belong to the same key. E.g.:
+```json
+[
+    {
+        "files": ["folder/sample-2.png"],
+        "alternates": [
+            {
+                "size": 36,
+                "dest": "[name]-huge"
+            }
+        ]
+    }
+]
+```
+
+# JSON Image Injection Usage
+
+JSON injection uses the same webpack options, but requires a folder structure where the first subdirectory in the template folder is the output json file name. That folder must contain the folders "data" and "images", with matching filenames for those which belong to the same key. E.g.:
 
 ### In "templates/index/data/sample.json"
 
@@ -251,7 +237,7 @@ This will output:
 
 # Responsive Image JSON Injection Usage
 
-Here is a full responsive image example that utilizes both resolution switching and art direction! If your source file has a "dest", that will be the basis of `[name]`. Your `files` images are always copied, even if never explicitly used, to serve as a backup in case a browser doesn't support the picture" element or the like.
+Here is a full responsive image example that utilizes both resolution switching and art direction! If your source file has a "dest", that will be the basis of `[name]`. Your `files` images are always copied, even if never explicitly used, to serve as a backup in case a browser doesn't support the `picture` element or `srcset`.
 
 Keep in mind that most fields can be safely omitted, but are recommended if you are using this with the included React file.
 
@@ -299,7 +285,7 @@ Keep in mind that most fields can be safely omitted, but are recommended if you 
 ]
 ```
 
-Which will output:
+Which will output 4 images and the following json:
 
 ```json
 {
@@ -309,7 +295,7 @@ Which will output:
     "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
     "srcset": [
         {
-            "src": "sample-8x8",
+            "src": "sample-8x8.png",
             "size": 8
         }
     ],
@@ -323,7 +309,7 @@ Which will output:
                     "size": 16
                 },
                 {
-                    "src": "sample-10-x16",
+                    "src": "sample-10-x16.png",
                     "size": 16
                 }
             ]
@@ -336,13 +322,10 @@ Which will output:
 
 You can use the resulting json directly with React.
 
+<!-- prettier-ignore -->
 ```javascript
 import ResponsiveImage from 'responsive-json-webpack-plugin/react'
 
-
-
 <ResponsiveImage image={outputJSON.imagePath} className="" alt="" />
-
-
 
 ```
