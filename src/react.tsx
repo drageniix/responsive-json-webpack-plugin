@@ -14,28 +14,11 @@ type source = {
     srcset: Array<individualImage>;
 };
 
-type jsonImage = {
-    src: string;
-    alt?: string;
-    size: number; //not used
-    sizes?: string;
-    srcset?: Array<individualImage>;
-    sources?: Array<source>;
-};
+const ResponsiveImage = props => {
+    const { image, className, alt, imagePath = '/', ...other } = props;
 
-const ResponsiveImage = ({
-    image,
-    className,
-    alt,
-    imagePath = '/'
-}: {
-    image: jsonImage;
-    className?: string;
-    alt?: string;
-    imagePath?: string;
-}) =>
-    image.sources && window && !!(window as any).HTMLPictureElement ? (
-        <picture>
+    return image.sources && window && !!(window as any).HTMLPictureElement ? (
+        <picture {...other}>
             {image.sources &&
                 image.sources.map((source, index) => (
                     <source
@@ -66,7 +49,9 @@ const ResponsiveImage = ({
             sizes={image.sizes}
             alt={alt || image.alt || image.src}
             className={className}
+            {...other}
         />
     );
+};
 
 export = ResponsiveImage;

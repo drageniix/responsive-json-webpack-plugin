@@ -9,6 +9,14 @@ exports[`snapshot 1`] = `
 
 exports[`snapshot 2`] = `
 <img
+  alt="test.jpg"
+  onClick={[Function]}
+  src="root/test.jpg"
+/>
+`;
+
+exports[`snapshot 3`] = `
+<img
   alt="Sample ALT"
   sizes="(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px"
   src="/sample-8.png"
@@ -16,7 +24,7 @@ exports[`snapshot 2`] = `
 />
 `;
 
-exports[`snapshot 3`] = `
+exports[`snapshot 4`] = `
 <picture>
   <source
     key="0"

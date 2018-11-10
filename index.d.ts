@@ -65,7 +65,7 @@ declare class ResponsiveJSONWebpackPlugin {
     processDirectFiles(dataFiles: Array<string>): Promise<void[]>;
     processRawFiles(dataFiles: Array<string>): Promise<(void | (void | void[])[][])[]>;
     validateRawFiles(data: Array<object>): object[];
-    processRawItem(rawItem: rawSrcImg, alternates?: Array<srcAlter>): Promise<void | void[]>;
+    processRawItem(file: string, rawItem: rawSrcImg, alternates?: Array<srcAlter>): Promise<void | void[]>;
     processRawItemObject(rawItem: srcImg, alternates?: Array<srcAlter>): Promise<void>;
     processRawItemString(rawItem: string, alternates: Array<srcAlter>): Promise<void[]>;
     processDataFolders(dataFolders: Array<string>): Promise<void[]>;

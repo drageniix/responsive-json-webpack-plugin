@@ -13,6 +13,17 @@ test('snapshot', () => {
     );
     expect(wrapper).toMatchSnapshot();
 
+    const wrapper1 = shallow(
+        <ResponsiveImage
+            image={{
+                src: 'test.jpg'
+            }}
+            imagePath="root/"
+            onClick={() => undefined}
+        />
+    );
+    expect(wrapper1).toMatchSnapshot();
+
     const wrapper2 = shallow(
         <ResponsiveImage
             image={{
