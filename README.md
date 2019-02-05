@@ -22,9 +22,9 @@ const ResponsiveJSONWebpackPlugin = require("responsive-json-webpack-plugin")
 module.exports = {
     plugins: [
         new ResponsiveJSONWebpackPlugin({
-            sourceTemplates = "src/assets/templates" //default
-            sourceImages = "src/assets/images", //default
-            outputFolder = "assets" //default
+            sourceTemplates: "src/assets/templates", //default
+            sourceImages: "src/assets/images", //default
+            outputFolder: "assets" //default
         })
 
     ]
