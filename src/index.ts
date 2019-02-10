@@ -533,7 +533,7 @@ class ResponsiveJSONWebpackPlugin {
 
     stripInvalid(str) {
         return str && typeof str === 'string'
-            ? str.replace(/[|&$%@"<>()+,]/g, '')
+            ? str.replace(/[|&$%"<>()+,]/g, '')
             : undefined;
     }
 

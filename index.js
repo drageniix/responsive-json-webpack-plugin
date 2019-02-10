@@ -471,7 +471,7 @@ var ResponsiveJSONWebpackPlugin = /** @class */ (function () {
     };
     ResponsiveJSONWebpackPlugin.prototype.stripInvalid = function (str) {
         return str && typeof str === 'string'
-            ? str.replace(/[|&$%@"<>()+,]/g, '')
+            ? str.replace(/[|&$%"<>()+,]/g, '')
             : undefined;
     };
     ResponsiveJSONWebpackPlugin.prototype.generateFileName = function (_a, dest) {
