@@ -111,23 +111,15 @@ For a more fine tuned image resize, your size can be that of [sharp's options](h
       {
         "dest": "[name]-huge",
         "size": {
-            /** Alternative means of specifying width. If both are present this take priority. */
-            "width": number,
-            /** Alternative means of specifying height. If both are present this take priority. */
-            "height": number,
-            /** How the image should be resized to fit both provided dimensions, one of cover, contain, fill, inside or outside. (optional, default 'cover') */
-            "fit": keyof FitEnum,
-            /** Position, gravity or strategy to use when fit is cover or contain. (optional, default 'centre') */
-            "position": number | string,
-            /** Background colour when using a fit of contain, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
-            "background": Color,
-            /** The kernel to use for image reduction. (optional, default 'lanczos3') */
-            "kernel": keyof KernelEnum,
-            /** Do not enlarge if the width or height are already less than the specified dimensions, equivalent to GraphicsMagick's > geometry option. (optional, default false) */
-            "withoutEnlargement": boolean,
-            /** Take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default true) */
-            "fastShrinkOnLoad": boolean
-        },
+          "width": "number",
+          "height": "number",
+          "fit": "keyof FitEnum",
+          "position": "number | string",
+          "background": "Color",
+          "kernel": "keyof KernelEnum",
+          "withoutEnlargement": "boolean",
+          "fastShrinkOnLoad": "boolean"
+        }
       }
     ]
   }

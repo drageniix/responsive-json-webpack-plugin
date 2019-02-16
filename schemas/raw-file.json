@@ -31,9 +31,66 @@
                                     "pattern": "^(.*)$"
                                 },
                                 "size": {
-                                    "type": "integer",
-                                    "title": "Desired Width of Image",
-                                    "default": 0
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "title": "Desired Width of Image",
+                                            "default": 0
+                                        },
+                                        {
+                                            "type": "object",
+                                            "title": "Sharp resize options",
+                                            "properties": {
+                                                "width": {
+                                                    "type": "number"
+                                                },
+                                                "height": {
+                                                    "type": "number"
+                                                },
+                                                "fit": {
+                                                    "type": "string"
+                                                },
+                                                "position": {
+                                                    "oneOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "number"
+                                                        }
+                                                    ]
+                                                },
+                                                "background": {
+                                                    "type": "object",
+                                                    "title": "Background Color",
+                                                    "required": ["r", "g", "b"],
+                                                    "properties": {
+                                                        "r": {
+                                                            "type": "number"
+                                                        },
+                                                        "g": {
+                                                            "type": "number"
+                                                        },
+                                                        "b": {
+                                                            "type": "number"
+                                                        },
+                                                        "alpha": {
+                                                            "type": "number"
+                                                        }
+                                                    }
+                                                },
+                                                "kernel": {
+                                                    "type": "string"
+                                                },
+                                                "withoutEnlargement": {
+                                                    "type": "boolean"
+                                                },
+                                                "fastShrinkOnLoad": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -66,9 +123,66 @@
                             "pattern": "^(.*)$"
                         },
                         "size": {
-                            "type": "integer",
-                            "title": "Desired Width of Image",
-                            "default": 0
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "title": "Desired Width of Image",
+                                    "default": 0
+                                },
+                                {
+                                    "type": "object",
+                                    "title": "Sharp resize options",
+                                    "properties": {
+                                        "width": {
+                                            "type": "number"
+                                        },
+                                        "height": {
+                                            "type": "number"
+                                        },
+                                        "fit": {
+                                            "type": "string"
+                                        },
+                                        "position": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "number"
+                                                }
+                                            ]
+                                        },
+                                        "background": {
+                                            "type": "object",
+                                            "title": "Background Color",
+                                            "required": ["r", "g", "b"],
+                                            "properties": {
+                                                "r": {
+                                                    "type": "number"
+                                                },
+                                                "g": {
+                                                    "type": "number"
+                                                },
+                                                "b": {
+                                                    "type": "number"
+                                                },
+                                                "alpha": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        },
+                                        "kernel": {
+                                            "type": "string"
+                                        },
+                                        "withoutEnlargement": {
+                                            "type": "boolean"
+                                        },
+                                        "fastShrinkOnLoad": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }

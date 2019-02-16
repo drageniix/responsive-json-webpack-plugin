@@ -8,16 +8,10 @@
         "title": "Set of Resize Instructions",
         "oneOf": [
             {
-                "required": [
-                    "files",
-                    "path"
-                ]
+                "required": ["files", "path"]
             },
             {
-                "required": [
-                    "set",
-                    "path"
-                ]
+                "required": ["set", "path"]
             }
         ],
         "properties": {
@@ -35,10 +29,7 @@
                 "items": {
                     "type": "object",
                     "title": "File",
-                    "required": [
-                        "src",
-                        "size"
-                    ],
+                    "required": ["src", "size"],
                     "properties": {
                         "src": {
                             "type": "string",
@@ -53,9 +44,66 @@
                             "pattern": "^(.*)$"
                         },
                         "size": {
-                            "type": "integer",
-                            "title": "Desired Width of Image",
-                            "default": 0
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "title": "Desired Width of Image",
+                                    "default": 0
+                                },
+                                {
+                                    "type": "object",
+                                    "title": "Sharp resize options",
+                                    "properties": {
+                                        "width": {
+                                            "type": "number"
+                                        },
+                                        "height": {
+                                            "type": "number"
+                                        },
+                                        "fit": {
+                                            "type": "string"
+                                        },
+                                        "position": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "number"
+                                                }
+                                            ]
+                                        },
+                                        "background": {
+                                            "type": "object",
+                                            "title": "Background Color",
+                                            "required": ["r", "g", "b"],
+                                            "properties": {
+                                                "r": {
+                                                    "type": "number"
+                                                },
+                                                "g": {
+                                                    "type": "number"
+                                                },
+                                                "b": {
+                                                    "type": "number"
+                                                },
+                                                "alpha": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        },
+                                        "kernel": {
+                                            "type": "string"
+                                        },
+                                        "withoutEnlargement": {
+                                            "type": "boolean"
+                                        },
+                                        "fastShrinkOnLoad": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -67,9 +115,7 @@
                     "img": {
                         "type": "object",
                         "title": "Resolution Switching Options",
-                        "required": [
-                            "srcset"
-                        ],
+                        "required": ["srcset"],
                         "properties": {
                             "sizes": {
                                 "type": "string"
@@ -79,10 +125,7 @@
                                 "items": {
                                     "type": "object",
                                     "title": "File",
-                                    "required": [
-                                        "dest",
-                                        "size"
-                                    ],
+                                    "required": ["dest", "size"],
                                     "properties": {
                                         "src": {
                                             "type": "string",
@@ -97,9 +140,66 @@
                                             "pattern": "^(.*)$"
                                         },
                                         "size": {
-                                            "type": "integer",
-                                            "title": "Desired Width of Image",
-                                            "default": 0
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "title": "Desired Width of Image",
+                                                    "default": 0
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "title": "Sharp resize options",
+                                                    "properties": {
+                                                        "width": {
+                                                            "type": "number"
+                                                        },
+                                                        "height": {
+                                                            "type": "number"
+                                                        },
+                                                        "fit": {
+                                                            "type": "string"
+                                                        },
+                                                        "position": {
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "string"
+                                                                },
+                                                                {
+                                                                    "type": "number"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "background": {
+                                                            "type": "object",
+                                                            "title": "Background Color",
+                                                            "required": ["r", "g", "b"],
+                                                            "properties": {
+                                                                "r": {
+                                                                    "type": "number"
+                                                                },
+                                                                "g": {
+                                                                    "type": "number"
+                                                                },
+                                                                "b": {
+                                                                    "type": "number"
+                                                                },
+                                                                "alpha": {
+                                                                    "type": "number"
+                                                                }
+                                                            }
+                                                        },
+                                                        "kernel": {
+                                                            "type": "string"
+                                                        },
+                                                        "withoutEnlargement": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "fastShrinkOnLoad": {
+                                                            "type": "boolean"
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -109,9 +209,7 @@
                     "sources": {
                         "type": "array",
                         "title": "Art Direction Sources",
-                        "required": [
-                            "srcset"
-                        ],
+                        "required": ["srcset"],
                         "items": {
                             "type": "object",
                             "properties": {
@@ -126,10 +224,7 @@
                                     "items": {
                                         "type": "object",
                                         "title": "File",
-                                        "required": [
-                                            "dest",
-                                            "size"
-                                        ],
+                                        "required": ["dest", "size"],
                                         "properties": {
                                             "src": {
                                                 "type": "string",
@@ -144,9 +239,66 @@
                                                 "pattern": "^(.*)$"
                                             },
                                             "size": {
-                                                "type": "integer",
-                                                "title": "Desired Width of Image",
-                                                "default": 0
+                                                "oneOf": [
+                                                    {
+                                                        "type": "integer",
+                                                        "title": "Desired Width of Image",
+                                                        "default": 0
+                                                    },
+                                                    {
+                                                        "type": "object",
+                                                        "title": "Sharp resize options",
+                                                        "properties": {
+                                                            "width": {
+                                                                "type": "number"
+                                                            },
+                                                            "height": {
+                                                                "type": "number"
+                                                            },
+                                                            "fit": {
+                                                                "type": "string"
+                                                            },
+                                                            "position": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "number"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "background": {
+                                                                "type": "object",
+                                                                "title": "Background Color",
+                                                                "required": ["r", "g", "b"],
+                                                                "properties": {
+                                                                    "r": {
+                                                                        "type": "number"
+                                                                    },
+                                                                    "g": {
+                                                                        "type": "number"
+                                                                    },
+                                                                    "b": {
+                                                                        "type": "number"
+                                                                    },
+                                                                    "alpha": {
+                                                                        "type": "number"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "kernel": {
+                                                                "type": "string"
+                                                            },
+                                                            "withoutEnlargement": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "fastShrinkOnLoad": {
+                                                                "type": "boolean"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
                                             }
                                         }
                                     }
@@ -172,10 +324,7 @@
                             "items": {
                                 "type": "object",
                                 "title": "File",
-                                "required": [
-                                    "src",
-                                    "size"
-                                ],
+                                "required": ["src", "size"],
                                 "properties": {
                                     "src": {
                                         "type": "string",
@@ -190,9 +339,66 @@
                                         "pattern": "^(.*)$"
                                     },
                                     "size": {
-                                        "type": "integer",
-                                        "title": "Desired Width of Image",
-                                        "default": 0
+                                        "oneOf": [
+                                            {
+                                                "type": "integer",
+                                                "title": "Desired Width of Image",
+                                                "default": 0
+                                            },
+                                            {
+                                                "type": "object",
+                                                "title": "Sharp resize options",
+                                                "properties": {
+                                                    "width": {
+                                                        "type": "number"
+                                                    },
+                                                    "height": {
+                                                        "type": "number"
+                                                    },
+                                                    "fit": {
+                                                        "type": "string"
+                                                    },
+                                                    "position": {
+                                                        "oneOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "number"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "background": {
+                                                        "type": "object",
+                                                        "title": "Background Color",
+                                                        "required": ["r", "g", "b"],
+                                                        "properties": {
+                                                            "r": {
+                                                                "type": "number"
+                                                            },
+                                                            "g": {
+                                                                "type": "number"
+                                                            },
+                                                            "b": {
+                                                                "type": "number"
+                                                            },
+                                                            "alpha": {
+                                                                "type": "number"
+                                                            }
+                                                        }
+                                                    },
+                                                    "kernel": {
+                                                        "type": "string"
+                                                    },
+                                                    "withoutEnlargement": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "fastShrinkOnLoad": {
+                                                        "type": "boolean"
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
                                 }
                             }
@@ -204,9 +410,7 @@
                                 "img": {
                                     "type": "object",
                                     "title": "Resolution Switching Options",
-                                    "required": [
-                                        "srcset"
-                                    ],
+                                    "required": ["srcset"],
                                     "properties": {
                                         "sizes": {
                                             "type": "string"
@@ -216,10 +420,7 @@
                                             "items": {
                                                 "type": "object",
                                                 "title": "File",
-                                                "required": [
-                                                    "dest",
-                                                    "size"
-                                                ],
+                                                "required": ["dest", "size"],
                                                 "properties": {
                                                     "src": {
                                                         "type": "string",
@@ -234,9 +435,66 @@
                                                         "pattern": "^(.*)$"
                                                     },
                                                     "size": {
-                                                        "type": "integer",
-                                                        "title": "Desired Width of Image",
-                                                        "default": 0
+                                                        "oneOf": [
+                                                            {
+                                                                "type": "integer",
+                                                                "title": "Desired Width of Image",
+                                                                "default": 0
+                                                            },
+                                                            {
+                                                                "type": "object",
+                                                                "title": "Sharp resize options",
+                                                                "properties": {
+                                                                    "width": {
+                                                                        "type": "number"
+                                                                    },
+                                                                    "height": {
+                                                                        "type": "number"
+                                                                    },
+                                                                    "fit": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "position": {
+                                                                        "oneOf": [
+                                                                            {
+                                                                                "type": "string"
+                                                                            },
+                                                                            {
+                                                                                "type": "number"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    "background": {
+                                                                        "type": "object",
+                                                                        "title": "Background Color",
+                                                                        "required": ["r", "g", "b"],
+                                                                        "properties": {
+                                                                            "r": {
+                                                                                "type": "number"
+                                                                            },
+                                                                            "g": {
+                                                                                "type": "number"
+                                                                            },
+                                                                            "b": {
+                                                                                "type": "number"
+                                                                            },
+                                                                            "alpha": {
+                                                                                "type": "number"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "kernel": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "withoutEnlargement": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "fastShrinkOnLoad": {
+                                                                        "type": "boolean"
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
                                                     }
                                                 }
                                             }
@@ -246,9 +504,7 @@
                                 "sources": {
                                     "type": "array",
                                     "title": "Art Direction Sources",
-                                    "required": [
-                                        "srcset"
-                                    ],
+                                    "required": ["srcset"],
                                     "items": {
                                         "type": "object",
                                         "properties": {
@@ -263,10 +519,7 @@
                                                 "items": {
                                                     "type": "object",
                                                     "title": "File",
-                                                    "required": [
-                                                        "dest",
-                                                        "size"
-                                                    ],
+                                                    "required": ["dest", "size"],
                                                     "properties": {
                                                         "src": {
                                                             "type": "string",
@@ -281,9 +534,66 @@
                                                             "pattern": "^(.*)$"
                                                         },
                                                         "size": {
-                                                            "type": "integer",
-                                                            "title": "Desired Width of Image",
-                                                            "default": 0
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "integer",
+                                                                    "title": "Desired Width of Image",
+                                                                    "default": 0
+                                                                },
+                                                                {
+                                                                    "type": "object",
+                                                                    "title": "Sharp resize options",
+                                                                    "properties": {
+                                                                        "width": {
+                                                                            "type": "number"
+                                                                        },
+                                                                        "height": {
+                                                                            "type": "number"
+                                                                        },
+                                                                        "fit": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "position": {
+                                                                            "oneOf": [
+                                                                                {
+                                                                                    "type": "string"
+                                                                                },
+                                                                                {
+                                                                                    "type": "number"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        "background": {
+                                                                            "type": "object",
+                                                                            "title": "Background Color",
+                                                                            "required": ["r", "g", "b"],
+                                                                            "properties": {
+                                                                                "r": {
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "g": {
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "b": {
+                                                                                    "type": "number"
+                                                                                },
+                                                                                "alpha": {
+                                                                                    "type": "number"
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        "kernel": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "withoutEnlargement": {
+                                                                            "type": "boolean"
+                                                                        },
+                                                                        "fastShrinkOnLoad": {
+                                                                            "type": "boolean"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
                                                         }
                                                     }
                                                 }

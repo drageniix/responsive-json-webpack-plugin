@@ -1,44 +1,5 @@
-declare type srcImg = {
-    src: string;
-    size: number;
-    dest?: string;
-};
-declare type rawSrcImg = srcImg | string;
-declare type srcAlter = {
-    dest: string;
-    size: number;
-};
-declare type imageTemplate = {
-    img?: {
-        sizes?: string;
-        srcset: Array<srcAlter>;
-    };
-    sources?: Array<{
-        media?: string;
-        sizes?: string;
-        srcset: Array<srcImg>;
-    }>;
-};
-declare type srcEntry = {
-    path: string;
-    alt?: string;
-    files: Array<srcImg>;
-    set?: Array<srcSet>;
-    imageTemplate?: imageTemplate;
-};
-declare type srcSet = {
-    alt?: string;
-    files: Array<srcImg>;
-    imageTemplate?: imageTemplate;
-};
-declare type sourceBase = {
-    index?: number;
-    alt?: string;
-    name: string;
-    extension: string;
-    src: string;
-    size: number;
-};
+import { ResizeOptions } from "sharp";
+import { srcAlter, srcEntry, rawSrcImg, srcSet, srcImg, sourceBase, imageTemplate } from "./types";
 declare class ResponsiveJSONWebpackPlugin {
     private options;
     private dirs;
@@ -60,7 +21,7 @@ declare class ResponsiveJSONWebpackPlugin {
     saveJSON(folder: string, jsonMap: Array<object>): void;
     savePicture(sourceFilePath: string, { src, size }: {
         src: string;
-        size: number;
+        size: number | ResizeOptions;
     }): Promise<void>;
     processDirectFiles(dataFiles: Array<string>): Promise<void[]>;
     processRawFiles(dataFiles: Array<string>): Promise<(void | (void | void[])[][])[]>;
