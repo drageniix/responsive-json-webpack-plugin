@@ -1,148 +1,150 @@
 [
-    {
-        "path" : "single",
-        "alt" : "standard sample image",
-        "files" : [
-            {
-                "src" : "sample-1.png",
-                "size" : 16
-            }
-        ] 
-    },
-    {
-        "path" : "section.single",
-        "files" : [
-            {
-                "src" : "sample-1.png",
-                "dest" : "starfruit",
-                "size" : 16
-            }
-        ] 
-    },
-    {
-        "path" : "multiple",
-        "alt" : "multplie test",
-        "files" : [
-            {
-                "src" : "sample-2.png",
-                "size" : 16
-            },
-            {
-                "src" : "sample-3.png",
-                "size" : 16
-            }
-        ] 
-    },
-    {
-        "path" : "folder_format",
-        "files" : [
-            {
-                "src" : "sampleFolder/sample-1.jpg",
-                "size" : 16
-            },
-            {
-                "src" : "sampleFolder/sample-2.TIF",
-                "dest" : "tiffany/[name]",
-                "size" : 16
-            },
-            {
-                "src" : "sampleFolder/sample-3.webp",
-                "size" : 16
-            }
-        ]
-    },
-    {
-        "path" : "array.[].image",
-        "set" : [
-            {
-                "alt" : "array item single",
-                "files" : [
-                    {
-                        "src" : "sample-4.png",
-                        "size" : 16
-                    }
-                ]
-            },
-            {
-                "alt": "array item muliple",
-                "files" : [
-                    {
-                        "src" : "sample-5.png",
-                        "size" : 16
-                    },
-                    {
-                        "src" : "sample-6.png",
-                        "size" : 16
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "path" : "resolution_switching",
-        "files" : [
-            {
-                "src" : "sample-7.png",
-                "dest" : "meep",
-                "size" : 16
-            }
-        ],
-        "imageTemplate": {
-            "img": {
-                "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
-                "srcset": [
-                    {
-                        "dest" : "pineapple-[index]",
-                        "size" : 16
-                    },
-                    {
-                        "dest": "pineapple-[index]1",
-                        "size": 8
-                    },
-                    {
-                        "dest": "pineapple-[index]2",
-                        "size": 36
-                    }
-                ]
-            }
+  {
+    "path": "single",
+    "alt": "standard sample image",
+    "files": [
+      {
+        "src": "sample-1.png",
+        "size": 16
+      }
+    ]
+  },
+  {
+    "path": "section.single",
+    "files": [
+      {
+        "src": "sample-1.png",
+        "dest": "starfruit",
+        "size": {
+          "width": 16
         }
-    },
-    {
-        "path" : "art_direction",
-        "files" : [
-            {
-                "src" : "sample-8.png",
-                "size" : 16
-            }
-        ],
-        "imageTemplate": {
-            "img": {
-                "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
-                "srcset": [
-                    {
-                        "dest": "[name]-8",
-                        "size": 8
-                    }
-                ]
-            },
-            "sources" : [
-                {
-                    "media" : "(max-width: 37.5em)",
-                    "sizes" : "20vw",
-                    "srcset" : [
-                        {
-                            "src" : "sample-9.png",
-                            "dest" :  "kiwi",
-                            "size" : 16
-                        },
-                        {
-                            "src": "sample-10.png",
-                            "dest" :  "[name]-10",
-                            "size" : 16
-                        }
-                    ]
-                }
-            ]
-        }
+      }
+    ]
+  },
+  {
+    "path": "multiple",
+    "alt": "multplie test",
+    "files": [
+      {
+        "src": "sample-2.png",
+        "size": 16
+      },
+      {
+        "src": "sample-3.png",
+        "size": 16
+      }
+    ]
+  },
+  {
+    "path": "folder_format",
+    "files": [
+      {
+        "src": "sampleFolder/sample-1.jpg",
+        "size": 16
+      },
+      {
+        "src": "sampleFolder/sample-2.TIF",
+        "dest": "tiffany/[name]",
+        "size": 16
+      },
+      {
+        "src": "sampleFolder/sample-3.webp",
+        "size": 16
+      }
+    ]
+  },
+  {
+    "path": "array.[].image",
+    "set": [
+      {
+        "alt": "array item single",
+        "files": [
+          {
+            "src": "sample-4.png",
+            "size": 16
+          }
+        ]
+      },
+      {
+        "alt": "array item muliple",
+        "files": [
+          {
+            "src": "sample-5.png",
+            "size": 16
+          },
+          {
+            "src": "sample-6.png",
+            "size": 16
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "path": "resolution_switching",
+    "files": [
+      {
+        "src": "sample-7.png",
+        "dest": "meep",
+        "size": 16
+      }
+    ],
+    "imageTemplate": {
+      "img": {
+        "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
+        "srcset": [
+          {
+            "dest": "pineapple-[index]",
+            "size": 16
+          },
+          {
+            "dest": "pineapple-[index]1",
+            "size": 8
+          },
+          {
+            "dest": "pineapple-[index]2",
+            "size": 36
+          }
+        ]
+      }
     }
+  },
+  {
+    "path": "art_direction",
+    "files": [
+      {
+        "src": "sample-8.png",
+        "size": 16
+      }
+    ],
+    "imageTemplate": {
+      "img": {
+        "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
+        "srcset": [
+          {
+            "dest": "[name]-8",
+            "size": 8
+          }
+        ]
+      },
+      "sources": [
+        {
+          "media": "(max-width: 37.5em)",
+          "sizes": "20vw",
+          "srcset": [
+            {
+              "src": "sample-9.png",
+              "dest": "kiwi",
+              "size": 16
+            },
+            {
+              "src": "sample-10.png",
+              "dest": "[name]-10",
+              "size": 16
+            }
+          ]
+        }
+      ]
+    }
+  }
 ]

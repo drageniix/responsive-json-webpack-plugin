@@ -1,76 +1,26 @@
 import fs from "fs-extra";
-import sharp from "sharp";
+import sharp, { ResizeOptions } from "sharp";
 import path from "path";
 import Ajv from "ajv";
 
 import rawSchema from "./schemas/raw-file.json";
 import responsiveSchema from "./schemas/responsive.json";
+import {
+  originalOptions,
+  directoryOptions,
+  srcAlter,
+  srcEntry,
+  rawSrcEntry,
+  rawSrcImg,
+  srcSet,
+  srcImg,
+  sourceBase,
+  imageTemplate
+} from "./types";
 const ajv = new Ajv();
 
 const rawValidate = ajv.compile(rawSchema);
 const responsiveValidate = ajv.compile(responsiveSchema);
-type originalOptions = {
-  sourceTemplates: string;
-  sourceImages: string;
-};
-type directoryOptions = {
-  dataPath: string;
-  imagePath: string;
-  rawFolder: string;
-  sourceTemplates: string;
-  sourceImages: string;
-  outputFolder: string;
-};
-type srcImg = {
-  src: string;
-  size: number;
-  dest?: string;
-};
-
-type rawSrcImg = srcImg | string;
-type rawSrcEntry = {
-  files: Array<rawSrcImg>;
-  alternates?: Array<srcAlter>;
-};
-
-type srcAlter = {
-  dest: string;
-  size: number;
-};
-type imageTemplate = {
-  img?: {
-    sizes?: string;
-    srcset: Array<srcAlter>;
-  };
-  sources?: Array<{
-    media?: string;
-    sizes?: string;
-    srcset: Array<srcImg>;
-  }>;
-};
-
-type srcEntry = {
-  path: string;
-  alt?: string;
-  files: Array<srcImg>;
-  set?: Array<srcSet>;
-  imageTemplate?: imageTemplate;
-};
-
-type srcSet = {
-  alt?: string;
-  files: Array<srcImg>;
-  imageTemplate?: imageTemplate;
-};
-
-type sourceBase = {
-  index?: number;
-  alt?: string;
-  name: string;
-  extension: string;
-  src: string;
-  size: number;
-};
 
 class ResponsiveJSONWebpackPlugin {
   private options: originalOptions;
@@ -129,7 +79,7 @@ class ResponsiveJSONWebpackPlugin {
     );
   }
 
-  apply(compiler) {
+  apply(compiler: any) {
     compiler.hooks.emit.tapPromise(
       "ResponsiveJSONWebpackPlugin",
       this.run.bind(this)
@@ -156,14 +106,19 @@ class ResponsiveJSONWebpackPlugin {
 
   async savePicture(
     sourceFilePath: string,
-    { src, size }: { src: string; size: number }
+    { src, size }: { src: string; size: number | ResizeOptions }
   ) {
     if (!this.processedFileNames.includes(src)) {
       this.processedFileNames.push(src);
       try {
-        const { data, info } = await sharp(sourceFilePath)
-          .resize(size)
-          .toBuffer({ resolveWithObject: true });
+        const { data, info } =
+          typeof size === "number"
+            ? await sharp(sourceFilePath)
+                .resize(size)
+                .toBuffer({ resolveWithObject: true })
+            : await sharp(sourceFilePath)
+                .resize(null, null, size)
+                .toBuffer({ resolveWithObject: true });
         this.assets[`./${src}`] = {
           source: () => data,
           size: () => info.size

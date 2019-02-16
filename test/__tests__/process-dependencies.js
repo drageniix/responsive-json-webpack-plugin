@@ -77,7 +77,7 @@ describe("Dependencies", () => {
   test("changed fileDependencies", () => {
     rjInstance.establishedDependencies.folders = {
       index: {
-        lastUpdate: 1550345210686,
+        lastUpdate: 1550352209141,
         filenames: [
           "data/icons.json",
           "data/_sample.json",

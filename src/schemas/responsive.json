@@ -1,301 +1,611 @@
 {
-    "definitions": {},
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "title": "Raw File Resizing JSON",
-    "items": {
-        "type": "object",
-        "title": "Set of Resize Instructions",
-        "oneOf": [
-            {
-                "required": [
-                    "files",
-                    "path"
-                ]
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "title": "Raw File Resizing JSON",
+  "items": {
+    "type": "object",
+    "title": "Set of Resize Instructions",
+    "oneOf": [
+      {
+        "required": ["files", "path"]
+      },
+      {
+        "required": ["set", "path"]
+      }
+    ],
+    "properties": {
+      "path": {
+        "type": "string",
+        "title": "Path to Place Json"
+      },
+      "alt": {
+        "type": "string",
+        "title": "Description"
+      },
+      "files": {
+        "type": "array",
+        "title": "Files to Process",
+        "items": {
+          "type": "object",
+          "title": "File",
+          "required": ["src", "size"],
+          "properties": {
+            "src": {
+              "type": "string",
+              "title": "Filepath",
+              "default": "",
+              "pattern": "^(.*)$"
             },
-            {
-                "required": [
-                    "set",
-                    "path"
-                ]
+            "dest": {
+              "type": "string",
+              "title": "Output Filename",
+              "default": "",
+              "pattern": "^(.*)$"
+            },
+            "size": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "title": "Desired Width of Image",
+                  "default": 0
+                },
+                {
+                  "type": "object",
+                  "title": "Sharp resize options",
+                  "properties": {
+                    "width": {
+                      "type": "number"
+                    },
+                    "height": {
+                      "type": "number"
+                    },
+                    "fit": {
+                      "type": "string"
+                    },
+                    "position": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "background": {
+                      "type": "object",
+                      "title": "Background Color",
+                      "required": ["r", "g", "b"],
+                      "properties": {
+                        "r": {
+                          "type": "number"
+                        },
+                        "g": {
+                          "type": "number"
+                        },
+                        "b": {
+                          "type": "number"
+                        },
+                        "alpha": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "kernel": {
+                      "type": "string"
+                    },
+                    "withoutEnlargement": {
+                      "type": "boolean"
+                    },
+                    "fastShrinkOnLoad": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              ]
             }
-        ],
+          }
+        }
+      },
+      "imageTemplate": {
+        "type": "object",
+        "title": "Responsive Image Options",
         "properties": {
-            "path" : {
-                "type": "string",
-                "title": "Path to Place Json"
-            },
-            "alt" : {
-                "type": "string",
-                "title": "Description"
-            },
-            "files": {
+          "img": {
+            "type": "object",
+            "title": "Resolution Switching Options",
+            "required": ["srcset"],
+            "properties": {
+              "sizes": {
+                "type": "string"
+              },
+              "srcset": {
                 "type": "array",
-                "title": "Files to Process",
                 "items": {
+                  "type": "object",
+                  "title": "File",
+                  "required": ["dest", "size"],
+                  "properties": {
+                    "src": {
+                      "type": "string",
+                      "title": "Filepath",
+                      "default": "",
+                      "pattern": "^(.*)$"
+                    },
+                    "dest": {
+                      "type": "string",
+                      "title": "Output Filename",
+                      "default": "",
+                      "pattern": "^(.*)$"
+                    },
+                    "size": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "title": "Desired Width of Image",
+                          "default": 0
+                        },
+                        {
+                          "type": "object",
+                          "title": "Sharp resize options",
+                          "properties": {
+                            "width": {
+                              "type": "number"
+                            },
+                            "height": {
+                              "type": "number"
+                            },
+                            "fit": {
+                              "type": "string"
+                            },
+                            "position": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "background": {
+                              "type": "object",
+                              "title": "Background Color",
+                              "required": ["r", "g", "b"],
+                              "properties": {
+                                "r": {
+                                  "type": "number"
+                                },
+                                "g": {
+                                  "type": "number"
+                                },
+                                "b": {
+                                  "type": "number"
+                                },
+                                "alpha": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "kernel": {
+                              "type": "string"
+                            },
+                            "withoutEnlargement": {
+                              "type": "boolean"
+                            },
+                            "fastShrinkOnLoad": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "sources": {
+            "type": "array",
+            "title": "Art Direction Sources",
+            "required": ["srcset"],
+            "items": {
+              "type": "object",
+              "properties": {
+                "sizes": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "string"
+                },
+                "srcset": {
+                  "type": "array",
+                  "items": {
                     "type": "object",
                     "title": "File",
-                    "required": [
-                        "src",
-                        "size"
-                    ],
+                    "required": ["dest", "size"],
                     "properties": {
-                        "src": {
+                      "src": {
+                        "type": "string",
+                        "title": "Filepath",
+                        "default": "",
+                        "pattern": "^(.*)$"
+                      },
+                      "dest": {
+                        "type": "string",
+                        "title": "Output Filename",
+                        "default": "",
+                        "pattern": "^(.*)$"
+                      },
+                      "size": {
+                        "oneOf": [
+                          {
+                            "type": "integer",
+                            "title": "Desired Width of Image",
+                            "default": 0
+                          },
+                          {
+                            "type": "object",
+                            "title": "Sharp resize options",
+                            "properties": {
+                              "width": {
+                                "type": "number"
+                              },
+                              "height": {
+                                "type": "number"
+                              },
+                              "fit": {
+                                "type": "string"
+                              },
+                              "position": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "background": {
+                                "type": "object",
+                                "title": "Background Color",
+                                "required": ["r", "g", "b"],
+                                "properties": {
+                                  "r": {
+                                    "type": "number"
+                                  },
+                                  "g": {
+                                    "type": "number"
+                                  },
+                                  "b": {
+                                    "type": "number"
+                                  },
+                                  "alpha": {
+                                    "type": "number"
+                                  }
+                                }
+                              },
+                              "kernel": {
+                                "type": "string"
+                              },
+                              "withoutEnlargement": {
+                                "type": "boolean"
+                              },
+                              "fastShrinkOnLoad": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "set": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "alt": {
+              "$id": "#/items/properties/alt",
+              "type": "string",
+              "title": "Description"
+            },
+            "files": {
+              "type": "array",
+              "title": "Files to Process",
+              "items": {
+                "type": "object",
+                "title": "File",
+                "required": ["src", "size"],
+                "properties": {
+                  "src": {
+                    "type": "string",
+                    "title": "Filepath",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                  },
+                  "dest": {
+                    "type": "string",
+                    "title": "Output Filename",
+                    "default": "",
+                    "pattern": "^(.*)$"
+                  },
+                  "size": {
+                    "oneOf": [
+                      {
+                        "type": "integer",
+                        "title": "Desired Width of Image",
+                        "default": 0
+                      },
+                      {
+                        "type": "object",
+                        "title": "Sharp resize options",
+                        "properties": {
+                          "width": {
+                            "type": "number"
+                          },
+                          "height": {
+                            "type": "number"
+                          },
+                          "fit": {
+                            "type": "string"
+                          },
+                          "position": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "background": {
+                            "type": "object",
+                            "title": "Background Color",
+                            "required": ["r", "g", "b"],
+                            "properties": {
+                              "r": {
+                                "type": "number"
+                              },
+                              "g": {
+                                "type": "number"
+                              },
+                              "b": {
+                                "type": "number"
+                              },
+                              "alpha": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "kernel": {
+                            "type": "string"
+                          },
+                          "withoutEnlargement": {
+                            "type": "boolean"
+                          },
+                          "fastShrinkOnLoad": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "imageTemplate": {
+              "type": "object",
+              "title": "Responsive Image Options",
+              "properties": {
+                "img": {
+                  "type": "object",
+                  "title": "Resolution Switching Options",
+                  "required": ["srcset"],
+                  "properties": {
+                    "sizes": {
+                      "type": "string"
+                    },
+                    "srcset": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "title": "File",
+                        "required": ["dest", "size"],
+                        "properties": {
+                          "src": {
                             "type": "string",
                             "title": "Filepath",
                             "default": "",
                             "pattern": "^(.*)$"
-                        },
-                        "dest": {
+                          },
+                          "dest": {
                             "type": "string",
                             "title": "Output Filename",
                             "default": "",
                             "pattern": "^(.*)$"
-                        },
-                        "size": {
-                            "type": "integer",
-                            "title": "Desired Width of Image",
-                            "default": 0
-                        }
-                    }
-                }
-            },
-            "imageTemplate": {
-                "type": "object",
-                "title": "Responsive Image Options",
-                "properties": {
-                    "img": {
-                        "type": "object",
-                        "title": "Resolution Switching Options",
-                        "required": [
-                            "srcset"
-                        ],
-                        "properties": {
-                            "sizes": {
-                                "type": "string"
-                            },
-                            "srcset": {
-                                "type": "array",
-                                "items": {
+                          },
+                          "size": {
+                            "oneOf": [
+                              {
+                                "type": "integer",
+                                "title": "Desired Width of Image",
+                                "default": 0
+                              },
+                              {
+                                "type": "object",
+                                "title": "Sharp resize options",
+                                "properties": {
+                                  "width": {
+                                    "type": "number"
+                                  },
+                                  "height": {
+                                    "type": "number"
+                                  },
+                                  "fit": {
+                                    "type": "string"
+                                  },
+                                  "position": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "background": {
                                     "type": "object",
-                                    "title": "File",
-                                    "required": [
-                                        "dest",
-                                        "size"
-                                    ],
+                                    "title": "Background Color",
+                                    "required": ["r", "g", "b"],
                                     "properties": {
-                                        "src": {
-                                            "type": "string",
-                                            "title": "Filepath",
-                                            "default": "",
-                                            "pattern": "^(.*)$"
-                                        },
-                                        "dest": {
-                                            "type": "string",
-                                            "title": "Output Filename",
-                                            "default": "",
-                                            "pattern": "^(.*)$"
-                                        },
-                                        "size": {
-                                            "type": "integer",
-                                            "title": "Desired Width of Image",
-                                            "default": 0
-                                        }
+                                      "r": {
+                                        "type": "number"
+                                      },
+                                      "g": {
+                                        "type": "number"
+                                      },
+                                      "b": {
+                                        "type": "number"
+                                      },
+                                      "alpha": {
+                                        "type": "number"
+                                      }
                                     }
-                                }
-                            }
-                        }
-                    },
-                    "sources": {
-                        "type": "array",
-                        "title": "Art Direction Sources",
-                        "required": [
-                            "srcset"
-                        ],
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "sizes": {
+                                  },
+                                  "kernel": {
                                     "type": "string"
-                                },
-                                "media": {
-                                    "type": "string"
-                                },
-                                "srcset": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "title": "File",
-                                        "required": [
-                                            "dest",
-                                            "size"
-                                        ],
-                                        "properties": {
-                                            "src": {
-                                                "type": "string",
-                                                "title": "Filepath",
-                                                "default": "",
-                                                "pattern": "^(.*)$"
-                                            },
-                                            "dest": {
-                                                "type": "string",
-                                                "title": "Output Filename",
-                                                "default": "",
-                                                "pattern": "^(.*)$"
-                                            },
-                                            "size": {
-                                                "type": "integer",
-                                                "title": "Desired Width of Image",
-                                                "default": 0
-                                            }
-                                        }
-                                    }
+                                  },
+                                  "withoutEnlargement": {
+                                    "type": "boolean"
+                                  },
+                                  "fastShrinkOnLoad": {
+                                    "type": "boolean"
+                                  }
                                 }
-                            }
+                              }
+                            ]
+                          }
                         }
+                      }
                     }
-                }
-            },
-            "set" : {
-                "type": "array",
-                "items": {
+                  }
+                },
+                "sources": {
+                  "type": "array",
+                  "title": "Art Direction Sources",
+                  "required": ["srcset"],
+                  "items": {
                     "type": "object",
                     "properties": {
-                        "alt": {
-                            "$id": "#/items/properties/alt",
-                            "type": "string",
-                            "title": "Description"
-                        },
-                        "files": {
-                            "type": "array",
-                            "title": "Files to Process",
-                            "items": {
-                                "type": "object",
-                                "title": "File",
-                                "required": [
-                                    "src",
-                                    "size"
-                                ],
-                                "properties": {
-                                    "src": {
-                                        "type": "string",
-                                        "title": "Filepath",
-                                        "default": "",
-                                        "pattern": "^(.*)$"
-                                    },
-                                    "dest": {
-                                        "type": "string",
-                                        "title": "Output Filename",
-                                        "default": "",
-                                        "pattern": "^(.*)$"
-                                    },
-                                    "size": {
-                                        "type": "integer",
-                                        "title": "Desired Width of Image",
-                                        "default": 0
-                                    }
-                                }
-                            }
-                        },
-                        "imageTemplate": {
-                            "type": "object",
-                            "title": "Responsive Image Options",
-                            "properties": {
-                                "img": {
-                                    "type": "object",
-                                    "title": "Resolution Switching Options",
-                                    "required": [
-                                        "srcset"
-                                    ],
-                                    "properties": {
-                                        "sizes": {
-                                            "type": "string"
-                                        },
-                                        "srcset": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "title": "File",
-                                                "required": [
-                                                    "dest",
-                                                    "size"
-                                                ],
-                                                "properties": {
-                                                    "src": {
-                                                        "type": "string",
-                                                        "title": "Filepath",
-                                                        "default": "",
-                                                        "pattern": "^(.*)$"
-                                                    },
-                                                    "dest": {
-                                                        "type": "string",
-                                                        "title": "Output Filename",
-                                                        "default": "",
-                                                        "pattern": "^(.*)$"
-                                                    },
-                                                    "size": {
-                                                        "type": "integer",
-                                                        "title": "Desired Width of Image",
-                                                        "default": 0
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                      "sizes": {
+                        "type": "string"
+                      },
+                      "media": {
+                        "type": "string"
+                      },
+                      "srcset": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "title": "File",
+                          "required": ["dest", "size"],
+                          "properties": {
+                            "src": {
+                              "type": "string",
+                              "title": "Filepath",
+                              "default": "",
+                              "pattern": "^(.*)$"
+                            },
+                            "dest": {
+                              "type": "string",
+                              "title": "Output Filename",
+                              "default": "",
+                              "pattern": "^(.*)$"
+                            },
+                            "size": {
+                              "oneOf": [
+                                {
+                                  "type": "integer",
+                                  "title": "Desired Width of Image",
+                                  "default": 0
                                 },
-                                "sources": {
-                                    "type": "array",
-                                    "title": "Art Direction Sources",
-                                    "required": [
-                                        "srcset"
-                                    ],
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "sizes": {
-                                                "type": "string"
-                                            },
-                                            "media": {
-                                                "type": "string"
-                                            },
-                                            "srcset": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "title": "File",
-                                                    "required": [
-                                                        "dest",
-                                                        "size"
-                                                    ],
-                                                    "properties": {
-                                                        "src": {
-                                                            "type": "string",
-                                                            "title": "Filepath",
-                                                            "default": "",
-                                                            "pattern": "^(.*)$"
-                                                        },
-                                                        "dest": {
-                                                            "type": "string",
-                                                            "title": "Output Filename",
-                                                            "default": "",
-                                                            "pattern": "^(.*)$"
-                                                        },
-                                                        "size": {
-                                                            "type": "integer",
-                                                            "title": "Desired Width of Image",
-                                                            "default": 0
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                {
+                                  "type": "object",
+                                  "title": "Sharp resize options",
+                                  "properties": {
+                                    "width": {
+                                      "type": "number"
+                                    },
+                                    "height": {
+                                      "type": "number"
+                                    },
+                                    "fit": {
+                                      "type": "string"
+                                    },
+                                    "position": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
                                         }
+                                      ]
+                                    },
+                                    "background": {
+                                      "type": "object",
+                                      "title": "Background Color",
+                                      "required": ["r", "g", "b"],
+                                      "properties": {
+                                        "r": {
+                                          "type": "number"
+                                        },
+                                        "g": {
+                                          "type": "number"
+                                        },
+                                        "b": {
+                                          "type": "number"
+                                        },
+                                        "alpha": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    },
+                                    "kernel": {
+                                      "type": "string"
+                                    },
+                                    "withoutEnlargement": {
+                                      "type": "boolean"
+                                    },
+                                    "fastShrinkOnLoad": {
+                                      "type": "boolean"
                                     }
+                                  }
                                 }
+                              ]
                             }
+                          }
                         }
+                      }
                     }
+                  }
                 }
+              }
             }
+          }
         }
+      }
     }
+  }
 }

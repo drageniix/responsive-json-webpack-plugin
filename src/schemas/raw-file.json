@@ -1,78 +1,192 @@
 {
-    "definitions": {},
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "title": "Raw File Resizing JSON",
-    "items": {
-        "type": "object",
-        "title": "Set of Resize Instructions",
-        "required": ["files"],
-        "properties": {
-            "files": {
-                "type": "array",
-                "title": "Files to Process",
-                "items": {
-                    "oneOf": [
-                        {
-                            "type": "object",
-                            "title": "File",
-                            "required": ["src"],
-                            "properties": {
-                                "src": {
-                                    "type": "string",
-                                    "title": "Filepath",
-                                    "default": "",
-                                    "pattern": "^(.*)$"
-                                },
-                                "dest": {
-                                    "type": "string",
-                                    "title": "Output Filename",
-                                    "default": "",
-                                    "pattern": "^(.*)$"
-                                },
-                                "size": {
-                                    "type": "integer",
-                                    "title": "Desired Width of Image",
-                                    "default": 0
-                                }
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "title": "Raw File Resizing JSON",
+  "items": {
+    "type": "object",
+    "title": "Set of Resize Instructions",
+    "required": ["files"],
+    "properties": {
+      "files": {
+        "type": "array",
+        "title": "Files to Process",
+        "items": {
+          "oneOf": [
+            {
+              "type": "object",
+              "title": "File",
+              "required": ["src"],
+              "properties": {
+                "src": {
+                  "type": "string",
+                  "title": "Filepath",
+                  "default": "",
+                  "pattern": "^(.*)$"
+                },
+                "dest": {
+                  "type": "string",
+                  "title": "Output Filename",
+                  "default": "",
+                  "pattern": "^(.*)$"
+                },
+                "size": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "title": "Desired Width of Image",
+                      "default": 0
+                    },
+                    {
+                      "type": "object",
+                      "title": "Sharp resize options",
+                      "properties": {
+                        "width": {
+                          "type": "number"
+                        },
+                        "height": {
+                          "type": "number"
+                        },
+                        "fit": {
+                          "type": "string"
+                        },
+                        "position": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
                             }
+                          ]
+                        },
+                        "background": {
+                          "type": "object",
+                          "title": "Background Color",
+                          "required": ["r", "g", "b"],
+                          "properties": {
+                            "r": {
+                              "type": "number"
+                            },
+                            "g": {
+                              "type": "number"
+                            },
+                            "b": {
+                              "type": "number"
+                            },
+                            "alpha": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "kernel": {
+                          "type": "string"
+                        },
+                        "withoutEnlargement": {
+                          "type": "boolean"
+                        },
+                        "fastShrinkOnLoad": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "string",
+              "title": "Filepath",
+              "pattern": "^(.*)$"
+            }
+          ]
+        }
+      },
+      "alternates": {
+        "type": "array",
+        "title": "The Alternates Schema",
+        "items": {
+          "type": "object",
+          "title": "File",
+          "required": ["dest", "size"],
+          "properties": {
+            "src": {
+              "type": "string",
+              "title": "Filepath",
+              "default": "",
+              "pattern": "^(.*)$"
+            },
+            "dest": {
+              "type": "string",
+              "title": "Output Filename",
+              "default": "",
+              "pattern": "^(.*)$"
+            },
+            "size": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "title": "Desired Width of Image",
+                  "default": 0
+                },
+                {
+                  "type": "object",
+                  "title": "Sharp resize options",
+                  "properties": {
+                    "width": {
+                      "type": "number"
+                    },
+                    "height": {
+                      "type": "number"
+                    },
+                    "fit": {
+                      "type": "string"
+                    },
+                    "position": {
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
                         {
-                            "type": "string",
-                            "title": "Filepath",
-                            "pattern": "^(.*)$"
+                          "type": "number"
                         }
-                    ]
-                }
-            },
-            "alternates": {
-                "type": "array",
-                "title": "The Alternates Schema",
-                "items": {
-                    "type": "object",
-                    "title": "File",
-                    "required": ["dest", "size"],
-                    "properties": {
-                        "src": {
-                            "type": "string",
-                            "title": "Filepath",
-                            "default": "",
-                            "pattern": "^(.*)$"
+                      ]
+                    },
+                    "background": {
+                      "type": "object",
+                      "title": "Background Color",
+                      "required": ["r", "g", "b"],
+                      "properties": {
+                        "r": {
+                          "type": "number"
                         },
-                        "dest": {
-                            "type": "string",
-                            "title": "Output Filename",
-                            "default": "",
-                            "pattern": "^(.*)$"
+                        "g": {
+                          "type": "number"
                         },
-                        "size": {
-                            "type": "integer",
-                            "title": "Desired Width of Image",
-                            "default": 0
+                        "b": {
+                          "type": "number"
+                        },
+                        "alpha": {
+                          "type": "number"
                         }
+                      }
+                    },
+                    "kernel": {
+                      "type": "string"
+                    },
+                    "withoutEnlargement": {
+                      "type": "boolean"
+                    },
+                    "fastShrinkOnLoad": {
+                      "type": "boolean"
                     }
+                  }
                 }
+              ]
             }
+          }
         }
+      }
     }
+  }
 }
