@@ -44,18 +44,18 @@ src/assets/templates/images.json
 
 ```json
 [
-    {
-        "files": [
-            {
-                "src": "sample.png",
-                "size": 16
-            },
-            {
-                "src": "sample.jpg",
-                "size": 32
-            }
-        ]
-    }
+  {
+    "files": [
+      {
+        "src": "sample.png",
+        "size": 16
+      },
+      {
+        "src": "sample.jpg",
+        "size": 32
+      }
+    ]
+  }
 ]
 ```
 
@@ -63,25 +63,25 @@ The following will create a 16px helloworld.png, a 36px width "helloworld-huge.p
 
 ```json
 [
-    {
-        "files": [
-            {
-                "src": "folder/sample-2.png",
-                "dest": "helloworld",
-                "size": 16
-            }
-        ],
-        "alternates": [
-            {
-                "size": 36,
-                "dest": "[name]-huge"
-            },
-            {
-                "size": 8,
-                "dest": "[name]-[size]"
-            }
-        ]
-    }
+  {
+    "files": [
+      {
+        "src": "folder/sample-2.png",
+        "dest": "helloworld",
+        "size": 16
+      }
+    ],
+    "alternates": [
+      {
+        "size": 36,
+        "dest": "[name]-huge"
+      },
+      {
+        "size": 8,
+        "dest": "[name]-[size]"
+      }
+    ]
+  }
 ]
 ```
 
@@ -89,15 +89,48 @@ You can skip copying the original file by omitting the `size` property of the so
 
 ```json
 [
-    {
-        "files": ["folder/sample-2.png"],
-        "alternates": [
-            {
-                "size": 36,
-                "dest": "[name]-huge"
-            }
-        ]
-    }
+  {
+    "files": ["folder/sample-2.png"],
+    "alternates": [
+      {
+        "size": 36,
+        "dest": "[name]-huge"
+      }
+    ]
+  }
+]
+```
+
+For a more fine tuned image resize, your size can be that of [sharp's options](http://sharp.pixelplumbing.com/en/stable/api-resize/):
+
+```json
+[
+  {
+    "files": ["folder/sample-2.png"],
+    "alternates": [
+      {
+        "dest": "[name]-huge",
+        "size": {
+            /** Alternative means of specifying width. If both are present this take priority. */
+            "width": number,
+            /** Alternative means of specifying height. If both are present this take priority. */
+            "height": number,
+            /** How the image should be resized to fit both provided dimensions, one of cover, contain, fill, inside or outside. (optional, default 'cover') */
+            "fit": keyof FitEnum,
+            /** Position, gravity or strategy to use when fit is cover or contain. (optional, default 'centre') */
+            "position": number | string,
+            /** Background colour when using a fit of contain, parsed by the color module, defaults to black without transparency. (optional, default {r:0,g:0,b:0,alpha:1}) */
+            "background": Color,
+            /** The kernel to use for image reduction. (optional, default 'lanczos3') */
+            "kernel": keyof KernelEnum,
+            /** Do not enlarge if the width or height are already less than the specified dimensions, equivalent to GraphicsMagick's > geometry option. (optional, default false) */
+            "withoutEnlargement": boolean,
+            /** Take greater advantage of the JPEG and WebP shrink-on-load feature, which can lead to a slight moiré pattern on some images. (optional, default true) */
+            "fastShrinkOnLoad": boolean
+        },
+      }
+    ]
+  }
 ]
 ```
 
@@ -109,10 +142,10 @@ JSON injection uses the same webpack options, but requires a folder structure wh
 
 ```json
 {
-    "text": "This is sample text.",
-    "section": {
-        "title": "Sample Section Title"
-    }
+  "text": "This is sample text.",
+  "section": {
+    "title": "Sample Section Title"
+  }
 }
 ```
 
@@ -120,7 +153,7 @@ JSON injection uses the same webpack options, but requires a folder structure wh
 
 ```json
 {
-    "text": "This is other sample text."
+  "text": "This is other sample text."
 }
 ```
 
@@ -128,26 +161,26 @@ JSON injection uses the same webpack options, but requires a folder structure wh
 
 ```json
 [
-    {
-        "path": "image",
-        "alt": "standard sample image",
-        "files": [
-            {
-                "src": "sample-3.png",
-                "size": 16
-            }
-        ]
-    },
-    {
-        "path": "section.image",
-        "files": [
-            {
-                "src": "sample-3.png",
-                "dest": "section",
-                "size": 24
-            }
-        ]
-    }
+  {
+    "path": "image",
+    "alt": "standard sample image",
+    "files": [
+      {
+        "src": "sample-3.png",
+        "size": 16
+      }
+    ]
+  },
+  {
+    "path": "section.image",
+    "files": [
+      {
+        "src": "sample-3.png",
+        "dest": "section",
+        "size": 24
+      }
+    ]
+  }
 ]
 ```
 
@@ -155,24 +188,24 @@ Will output a 16px width "sample-3.png" and a 24px with "section.png" along with
 
 ```json
 {
-    "sample": {
-        "text": "This is sample text.",
-        "image": {
-            "src": "sample-3.png",
-            "alt": "standard sample image",
-            "size": 16
-        },
-        "section": {
-            "title": "Sample Section Title",
-            "image": {
-                "src": "section.png",
-                "size": 24
-            }
-        }
+  "sample": {
+    "text": "This is sample text.",
+    "image": {
+      "src": "sample-3.png",
+      "alt": "standard sample image",
+      "size": 16
     },
-    "other": {
-        "text": "This is other sample text."
+    "section": {
+      "title": "Sample Section Title",
+      "image": {
+        "src": "section.png",
+        "size": 24
+      }
     }
+  },
+  "other": {
+    "text": "This is other sample text."
+  }
 }
 ```
 
@@ -180,19 +213,19 @@ You can also output an array at the path by giving multiple files in an image te
 
 ```json
 [
-    {
-        "path": "multiple",
-        "files": [
-            {
-                "src": "sample-2.png",
-                "size": 16
-            },
-            {
-                "src": "sample-3.png",
-                "size": 16
-            }
-        ]
-    }
+  {
+    "path": "multiple",
+    "files": [
+      {
+        "src": "sample-2.png",
+        "size": 16
+      },
+      {
+        "src": "sample-3.png",
+        "size": 16
+      }
+    ]
+  }
 ]
 ```
 
@@ -202,19 +235,19 @@ The `[]` will be replaced by the index of the item in the set. The index does no
 
 ```json
 {
-    "path": "array.[].image",
-    "set": [
+  "path": "array.[].image",
+  "set": [
+    {
+      "alt": "array item",
+      "files": [
         {
-            "alt": "array item",
-            "files": [
-                {
-                    "src": "sample-arr.png",
-                    "size": 16,
-                    "dest": "array-image-[index]"
-                }
-            ]
+          "src": "sample-arr.png",
+          "size": 16,
+          "dest": "array-image-[index]"
         }
-    ]
+      ]
+    }
+  ]
 }
 ```
 
@@ -222,16 +255,16 @@ This will output:
 
 ```json
 {
-    "array": [
-        {
-            "text": "existing text in data json",
-            "image": {
-                "alt": "array item 1",
-                "src": "arr-image-1.png",
-                "size": 16
-            }
-        }
-    ]
+  "array": [
+    {
+      "text": "existing text in data json",
+      "image": {
+        "alt": "array item 1",
+        "src": "arr-image-1.png",
+        "size": 16
+      }
+    }
+  ]
 }
 ```
 
@@ -243,45 +276,45 @@ Keep in mind that most fields can be safely omitted, but are recommended if you 
 
 ```json
 [
-    {
-        "path": "responsive",
-        "alt": "Sample ALT",
-        "files": [
+  {
+    "path": "responsive",
+    "alt": "Sample ALT",
+    "files": [
+      {
+        "src": "sample-8.png",
+        "size": 16
+      }
+    ],
+    "imageTemplate": {
+      "img": {
+        "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
+        "srcset": [
+          {
+            "dest": "[name]x8",
+            "size": 8
+          }
+        ]
+      },
+      "sources": [
+        {
+          "media": "(max-width: 37.5em)",
+          "sizes": "20vw",
+          "srcset": [
             {
-                "src": "sample-8.png",
-                "size": 16
-            }
-        ],
-        "imageTemplate": {
-            "img": {
-                "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
-                "srcset": [
-                    {
-                        "dest": "[name]x8",
-                        "size": 8
-                    }
-                ]
+              "src": "sample-9.png",
+              "dest": "potato",
+              "size": 16
             },
-            "sources": [
-                {
-                    "media": "(max-width: 37.5em)",
-                    "sizes": "20vw",
-                    "srcset": [
-                        {
-                            "src": "sample-9.png",
-                            "dest": "potato",
-                            "size": 16
-                        },
-                        {
-                            "src": "sample-10.png",
-                            "dest": "[name]-x[size]",
-                            "size": 16
-                        }
-                    ]
-                }
-            ]
+            {
+              "src": "sample-10.png",
+              "dest": "[name]-x[size]",
+              "size": 16
+            }
+          ]
         }
+      ]
     }
+  }
 ]
 ```
 
@@ -289,32 +322,32 @@ Which will output 4 images and the following json:
 
 ```json
 {
-    "src": "sample-8.png",
-    "alt": "Sample ALT",
-    "size": 16,
-    "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
-    "srcset": [
+  "src": "sample-8.png",
+  "alt": "Sample ALT",
+  "size": 16,
+  "sizes": "(max-width: 56.25em) 20vw, (max-width: 37.5em) 30vw, 300px",
+  "srcset": [
+    {
+      "src": "sample-8x8.png",
+      "size": 8
+    }
+  ],
+  "sources": [
+    {
+      "media": "(max-width: 37.5em)",
+      "sizes": "20vw",
+      "srcset": [
         {
-            "src": "sample-8x8.png",
-            "size": 8
-        }
-    ],
-    "sources": [
+          "src": "potato.png",
+          "size": 16
+        },
         {
-            "media": "(max-width: 37.5em)",
-            "sizes": "20vw",
-            "srcset": [
-                {
-                    "src": "potato.png",
-                    "size": 16
-                },
-                {
-                    "src": "sample-10-x16.png",
-                    "size": 16
-                }
-            ]
+          "src": "sample-10-x16.png",
+          "size": 16
         }
-    ]
+      ]
+    }
+  ]
 }
 ```
 
