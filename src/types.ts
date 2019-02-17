@@ -1,3 +1,4 @@
+import { ResizeOptions } from "sharp";
 export type originalOptions = {
   sourceTemplates: string;
   sourceImages: string;
@@ -14,7 +15,7 @@ export type directoryOptions = {
 
 export type srcImg = {
   src: string;
-  size: number;
+  size: number | ResizeOptions;
   dest?: string;
 };
 
@@ -27,7 +28,7 @@ export type rawSrcEntry = {
 
 export type srcAlter = {
   dest: string;
-  size: number;
+  size: number | ResizeOptions;
 };
 
 export type imageTemplate = {
@@ -62,5 +63,5 @@ export type sourceBase = {
   name: string;
   extension: string;
   src: string;
-  size: number;
+  size: number | ResizeOptions;
 };

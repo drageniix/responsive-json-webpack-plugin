@@ -111,14 +111,14 @@ For a more fine tuned image resize, your size can be that of [sharp's options](h
       {
         "dest": "[name]-huge",
         "size": {
-          "width": "number",
-          "height": "number",
-          "fit": "keyof FitEnum",
-          "position": "number | string",
-          "background": "Color",
-          "kernel": "keyof KernelEnum",
-          "withoutEnlargement": "boolean",
-          "fastShrinkOnLoad": "boolean"
+          "width": 16,
+          "height": 16,
+          "fit": "contain|cover|fill|inside|outside",
+          "position": "top | right top | right | right bottom | bottom | left bottom | left | left top | north | northeast | east | southeast | south | southwest | west | northwest | center | centre | cover",
+          "background": { "r": 0, "g": 0, "b": 0, "alpha": 0 },
+          "kernel": "nearest|cubic|lanczos2|lanczos3",
+          "withoutEnlargement": false,
+          "fastShrinkOnLoad": true
         }
       }
     ]

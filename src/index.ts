@@ -452,22 +452,39 @@ class ResponsiveJSONWebpackPlugin {
     return Math.max(str.lastIndexOf("\\"), str.lastIndexOf("/"));
   }
 
-  stripInvalid(str) {
+  stripInvalid(str: any) {
     return str && typeof str === "string"
       ? str.replace(/[|&$%"<>()+,]/g, "")
       : undefined;
   }
 
   generateFileName(
-    { name = "", index = 0, size = 0, extension = "" } = {},
-    dest?
+    {
+      name = "",
+      index = 0,
+      size = 0,
+      extension = ""
+    }: {
+      name?: string;
+      index?: number;
+      size?: number | ResizeOptions;
+      extension?: string;
+    } = {},
+    dest?: string
   ): string {
     let filename = this.stripInvalid(
       dest
         ? dest
             .replace("[name]", name)
-            .replace("[index]", index ? index : 1)
-            .replace("[size]", size ? size : "")
+            .replace("[index]", (index ? index : 1).toString())
+            .replace(
+              "[size]",
+              size && typeof size === "number"
+                ? size.toString()
+                : size && typeof size === "object" && size.width
+                ? size.width.toString()
+                : ""
+            )
         : name
     );
 

@@ -1,4 +1,4 @@
-import { ResizeOptions } from "sharp";
+import sharp, { ResizeOptions } from "sharp";
 import { srcAlter, srcEntry, rawSrcImg, srcSet, srcImg, sourceBase, imageTemplate } from "./types";
 declare class ResponsiveJSONWebpackPlugin {
     private options;
@@ -42,7 +42,7 @@ declare class ResponsiveJSONWebpackPlugin {
     createImgResolutions(source: any, { img }?: imageTemplate): Promise<{}>;
     createImg(source: sourceBase, dest?: string): Promise<{
         src: string;
-        size: number;
+        size: number | sharp.ResizeOptions;
         alt: string;
     }>;
     parseSource(filesLength: number, index: number, item: srcImg, alt?: string): sourceBase;
@@ -53,9 +53,9 @@ declare class ResponsiveJSONWebpackPlugin {
     generateFileName({ name, index, size, extension }?: {
         name?: string;
         index?: number;
-        size?: number;
+        size?: number | ResizeOptions;
         extension?: string;
-    }, dest?: any): string;
+    }, dest?: string): string;
     index(obj: object, objPath: string | Array<string>, value: any): any;
     getDependencies({ contextDependencies, fileDependencies, compiler }: {
         contextDependencies: any;
