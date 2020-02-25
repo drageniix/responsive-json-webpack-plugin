@@ -147,7 +147,7 @@ class ResponsiveJSONWebpackPlugin {
     return Promise.all(
       dataFiles.map(file =>
         fs
-          .readJSON(file)
+          .readJSON(path.join(__dirname, file))
           .then(data => this.validateRawFiles(data))
           .then(data =>
             Promise.all(
