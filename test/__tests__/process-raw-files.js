@@ -100,7 +100,7 @@ describe("raw files", () => {
     rjInstance.processRawItem = jest.fn();
     return rjInstance
       .processRawFiles([
-        "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\examples\\templates\\pure.json"
+        "../test/examples/templates/pure.json"
       ])
       .then(result => {
         expect(result).toHaveLength(1);
@@ -114,7 +114,7 @@ describe("raw files", () => {
     rjInstance.logErrors = jest.fn();
     return rjInstance
       .processRawFiles([
-        "D:\\Dropbox\\Programming\\Web Development\\_Packages\\ResponsiveJSONWebpackPlugin\\test\\examples\\templates\\invalid.json"
+        "../test/examples/templates/invalid.json"
       ])
       .then(() => {
         expect(rjInstance.logErrors).toHaveBeenCalled();

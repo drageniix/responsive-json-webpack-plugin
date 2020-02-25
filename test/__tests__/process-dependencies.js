@@ -46,10 +46,10 @@ describe("Dependencies", () => {
         index: {
           lastUpdate: expect.any(Number),
           filenames: [
-            "data/icons.json",
             "data/_sample.json",
-            "images/icons.json",
-            "images/_sample.json"
+            "data/icons.json",
+            "images/_sample.json",
+            "images/icons.json"
           ]
         },
         secondary: {
@@ -77,21 +77,21 @@ describe("Dependencies", () => {
   test("changed fileDependencies", () => {
     rjInstance.establishedDependencies.folders = {
       index: {
-        lastUpdate: 1550352209141,
+        lastUpdate: 1582625901337,
         filenames: [
-          "data/icons.json",
           "data/_sample.json",
-          "images/icons.json",
-          "images/_sample.json"
+          "data/icons.json",
+          "images/_sample.json",
+          "images/icons.json"
         ]
       }
     };
     rjInstance.establishedDependencies.files = {
-      [dir + "/examples/templates/pure.json"]: 1550345210688
+      [dir + "/examples/templates/pure.json"]: 1582625901337
     };
 
     rjInstance.establishedDependencies.direct = {
-      [dir + "/examples/templates/raw/invalid.json"]: 1550345210688
+      [dir + "/examples/templates/raw/invalid.json"]: 1582625901337
     };
 
     expect(rjInstance.getChangedDependencies(fileDependencies)).toEqual({
@@ -109,10 +109,10 @@ describe("Dependencies", () => {
       folders: {
         index: {
           filenames: [
-            "data/icons.json",
             "data/_sample.json",
-            "images/icons.json",
-            "images/_sample.json"
+            "data/icons.json",
+            "images/_sample.json",
+            "images/icons.json"
           ],
           lastUpdate: expect.any(Number)
         },
